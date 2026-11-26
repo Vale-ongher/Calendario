@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il Calendario degli indizi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#0a3a8c;
+  --sky-mid:#1d6fd6;
+  --sky-low:#78bdf7;
+  --ink:#ffffff;
+  --glass:rgba(255,255,255,.14);
+  --glass-line:rgba(255,255,255,.38);
+  --gold:#ffd34d;
+  --card:#fffaf1;
+  --card-ink:#1b2a4a;
+  --card-soft:#5a6b8c;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky-top:#04173f; --sky-mid:#0c3d8c; --sky-low:#3a7cd0;
+    --card:#14213d; --card-ink:#f2f5ff; --card-soft:#aebbd8;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky-top:#04173f; --sky-mid:#0c3d8c; --sky-low:#3a7cd0;
+  --card:#14213d; --card-ink:#f2f5ff; --card-soft:#aebbd8;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;
+  background:var(--sky-top);
+  color:var(--ink);
+  font-family:"Nunito","Trebuchet MS",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 55%,var(--sky-low) 100%)}
+#snow{position:fixed;inset:0;z-index:1;pointer-events:none}
+.page{position:relative;z-index:2;max-width:960px;margin:0 auto;padding:clamp(20px,5vw,48px) clamp(12px,3vw,24px) 40px}
+
+/* ---------- Titolo e countdown ---------- */
+header{text-align:center;margin-bottom:clamp(20px,4vw,36px)}
+h1{
+  font-family:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  font-weight:400;
+  font-size:clamp(2.1rem,8.2vw,4.4rem);
+  line-height:1.02;margin:0 0 .35em;letter-spacing:.01em;
+  text-shadow:0 3px 0 #0a2f73,0 6px 18px rgba(0,20,70,.45),0 0 28px rgba(255,211,77,.35);
+}
+.cd{display:inline-flex;flex-direction:column;align-items:center;gap:10px}
+.cd-label{margin:0;font-weight:700;font-size:clamp(.95rem,2.8vw,1.1rem);opacity:.95}
+.cd-units{display:flex;gap:clamp(6px,2vw,12px)}
+.unit{
+  min-width:clamp(62px,17vw,88px);padding:10px 6px 8px;border-radius:16px;
+  background:var(--glass);border:1.5px solid var(--glass-line);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.unit b{display:block;font-family:"Lilita One","Trebuchet MS",sans-serif;font-weight:400;font-size:clamp(1.7rem,7vw,2.6rem);line-height:1;font-variant-numeric:tabular-nums;color:var(--gold)}
+.unit span{display:block;font-size:.78rem;font-weight:700;margin-top:4px;opacity:.9}
+.howto{margin:14px 0 0;font-size:.92rem;opacity:.85}
+
+/* ---------- Griglia ---------- */
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,2.2vw,20px)}
+@media (max-width:720px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:500px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.box{
+  position:relative;aspect-ratio:1;border-radius:14px;perspective:800px;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 10px 18px rgba(2,22,70,.35);
+  outline:none;cursor:pointer;
+}
+.box:focus-visible{box-shadow:0 0 0 4px var(--gold),0 10px 18px rgba(2,22,70,.35)}
+.inside{
+  position:absolute;inset:0;border-radius:14px;overflow:hidden;background:#123;
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.18),inset 0 10px 22px rgba(0,0,0,.35);
+}
+.inside svg{display:block;width:100%;height:100%}
+.inside .badge{position:absolute;top:6px;left:6px;min-width:26px;height:26px;padding:0 6px;border-radius:13px;background:rgba(255,255,255,.92);color:#1b2a4a;font:400 .95rem/26px "Lilita One","Trebuchet MS",sans-serif;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+
+.door{
+  position:absolute;top:0;bottom:0;width:50%;
+  transition:transform 1s cubic-bezier(.25,1.35,.45,1),filter .3s;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),inset 0 -6px 12px rgba(0,0,0,.12);
+}
+.door.l{left:0;border-radius:14px 0 0 14px;transform-origin:left center;border-right:1px solid rgba(0,0,0,.25)}
+.door.r{right:0;border-radius:0 14px 14px 0;transform-origin:right center}
+.box.open .door.l{transform:rotateY(-108deg)}
+.box.open .door.r{transform:rotateY(108deg)}
+.box.instant .door{transition:none}
+
+.dnum{
+  position:absolute;top:8%;left:12%;
+  font-family:"Lilita One","Trebuchet MS",sans-serif;font-size:clamp(1.5rem,4.6vw,2.5rem);line-height:1;color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.25);
+}
+.dic{position:absolute;bottom:9%;right:12%;font-weight:800;font-size:clamp(.62rem,1.7vw,.85rem);color:#fff;opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.lock{position:absolute;top:9%;right:11%;font-size:clamp(.8rem,2.2vw,1.1rem);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.box.ready .lock,.box.open .lock{display:none}
+.box.locked .door{filter:saturate(.7) brightness(.9)}
+
+/* Scotch: metà sinistra sull’anta sinistra, metà destra sull’anta destra */
+.tape{
+  position:absolute;top:-3px;bottom:-3px;width:30%;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,0) 45%,rgba(255,255,255,.18)),
+    repeating-linear-gradient(0deg,rgba(150,110,50,.10) 0 2px,transparent 2px 7px),
+    rgba(226,200,142,.86);
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+  transition:transform .3s ease;
+}
+.door.l .tape{right:0;clip-path:polygon(0 3px,25% 0,50% 3px,75% 0,100% 2px,100% calc(100% - 2px),75% 100%,50% calc(100% - 3px),25% 100%,0 calc(100% - 3px))}
+.door.r .tape{left:0;clip-path:polygon(0 2px,25% 0,50% 3px,75% 0,100% 3px,100% calc(100% - 3px),75% 100%,50% calc(100% - 3px),25% 100%,0 calc(100% - 2px))}
+.box.cut .door.l .tape{transform:translateX(-2px)}
+.box.cut .door.r .tape{transform:translateX(2px)}
+
+.cutzone{position:absolute;top:0;bottom:0;left:30%;width:40%;z-index:3}
+.box.ready .cutzone{cursor:crosshair;touch-action:none}
+.box.open .cutzone{display:none}
+.cutline{position:absolute;top:0;bottom:0;left:50%;width:3px;transform:translateX(-50%);display:flex;flex-direction:column}
+.cutline i{flex:1;display:block}
+.cutline i.on{background:repeating-linear-gradient(180deg,rgba(60,30,0,.8) 0 3px,transparent 3px 5px)}
+.hint{display:none;position:absolute;top:-14px;left:50%;font-size:clamp(1.1rem,3vw,1.5rem);pointer-events:none;animation:hint 1.1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.box.ready .hint{display:block}
+.box.cutting .hint{display:none}
+.scissors{display:none;position:absolute;left:50%;top:0;font-size:1.8rem;pointer-events:none;transform:translate(-50%,-50%) rotate(90deg);filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))}
+.box.cutting .scissors{display:block}
+@keyframes hint{0%,100%{transform:translateX(-50%) rotate(90deg) translateX(0)}50%{transform:translateX(-50%) rotate(90deg) translateX(8px)}}
+
+.box.ready{animation:ready 2s ease-in-out infinite}
+@keyframes ready{0%,100%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 0 rgba(255,211,77,.0)}50%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 6px rgba(255,211,77,.55)}}
+.box.shake{animation:shake .45s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-2deg)}40%{transform:translateX(6px) rotate(2deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* ---------- Toast, banner, footer ---------- */
+#toast{
+  position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;
+  transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:rgba(8,30,80,.92);color:#fff;border:1.5px solid var(--glass-line);
+  padding:12px 18px;border-radius:14px;font-weight:700;font-size:.95rem;max-width:min(92vw,460px);text-align:center;
+  transition:opacity .25s,transform .25s;
+}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.preview{margin:0 auto 18px;max-width:560px;text-align:center;background:rgba(255,211,77,.18);border:1.5px dashed var(--gold);border-radius:14px;padding:10px 14px;font-weight:700;font-size:.92rem}
+.preview button{margin-left:8px;font:inherit;font-size:.85rem;padding:5px 12px;border-radius:999px;border:0;background:var(--gold);color:#1b2a4a;cursor:pointer}
+footer{text-align:center;margin-top:30px;font-size:.88rem;opacity:.8;line-height:1.5}
+
+/* ---------- Pulsante e accesso amministratore ---------- */
+.admin-btn{
+  position:fixed;z-index:20;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px));
+  font:700 .9rem/1 "Nunito","Trebuchet MS",sans-serif;color:#fff;cursor:pointer;
+  padding:10px 14px;border-radius:999px;border:1.5px solid var(--glass-line);
+  background:rgba(8,30,80,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:0 4px 12px rgba(0,10,40,.3);
+}
+.admin-btn:hover{background:rgba(8,30,80,.75)}
+.admin-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.admin-btn.on{background:var(--gold);color:#1b2a4a;border-color:var(--gold)}
+.login-card{width:min(100%,380px);padding:26px 22px 22px}
+.login-card h2{margin-bottom:6px}
+.login-card p.sub{margin:0 0 16px;text-align:center;color:var(--card-soft);font-size:.95rem}
+.login-card label{display:block;font-weight:700;font-size:.9rem;margin-bottom:6px}
+.login-card input{
+  width:100%;font:500 1.05rem "Nunito","Trebuchet MS",sans-serif;padding:12px 14px;border-radius:12px;
+  border:2px solid rgba(90,107,140,.35);background:transparent;color:var(--card-ink);
+}
+.login-card input:focus{outline:none;border-color:#3a86ff}
+.login-err{min-height:1.3em;margin:8px 0 0;color:#e63946;font-weight:700;font-size:.9rem}
+.login-card .enter{width:100%;margin-top:10px;padding:12px;border:0;border-radius:12px;background:#1d6fd6;color:#fff;font:800 1rem "Nunito","Trebuchet MS",sans-serif;cursor:pointer}
+.login-card .enter:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.login-card.shake{animation:shake .45s ease}
+@media (max-width:500px){.page{padding-top:64px}}
+
+/* ---------- Finestra dell’indizio ---------- */
+.modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.modal[hidden]{display:none}
+.backdrop{position:absolute;inset:0;background:rgba(3,18,55,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.card{
+  position:relative;width:min(100%,520px);max-height:100%;overflow:auto;
+  background:var(--card);color:var(--card-ink);border-radius:22px;padding:18px 18px 22px;
+  box-shadow:0 24px 60px rgba(0,10,40,.5);animation:pop .45s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.m-scene{width:min(100%,48vh);aspect-ratio:1;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 3px rgba(0,0,0,.08)}
+.m-scene svg{display:block;width:100%;height:100%}
+.m-kicker{margin:16px 0 2px;font-weight:700;font-size:.9rem;color:var(--card-soft);text-align:center}
+.card h2{margin:0 0 8px;font-family:"Lilita One","Trebuchet MS",sans-serif;font-weight:400;font-size:clamp(1.5rem,5vw,2rem);text-align:center;line-height:1.1}
+.m-text{margin:0 auto;max-width:42ch;font-size:1.05rem;line-height:1.55;text-align:center}
+.close{position:absolute;top:10px;right:10px;z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:1.5rem;line-height:1;cursor:pointer}
+.close:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- Animazioni delle scene ---------- */
+.a-wave{transform-origin:0 0;animation:wave .6s ease-in-out infinite alternate}
+.a-swing{transform-origin:0 0;animation:swing 2s ease-in-out infinite alternate}
+.a-pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.6s ease-in-out infinite}
+.a-twinkle{animation:twinkle 1.4s ease-in-out infinite}
+.a-blink{animation:blink 1s steps(1) infinite}
+.a-flicker{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .22s ease-in-out infinite alternate}
+.a-steam{animation:steam 2.4s ease-out infinite}
+.a-waddle{transform-origin:0 0;animation:waddle .7s ease-in-out infinite alternate}
+.a-slide{animation:slide 3.2s ease-in infinite}
+.a-spin{transform-origin:0 0;animation:spin 9s linear infinite}
+.a-spinfast{transform-origin:0 0;animation:spin .45s linear infinite}
+.a-fall{animation:fall 3s linear infinite}
+.a-blinkeye{transform-box:fill-box;transform-origin:center;animation:blinkeye 3.2s infinite}
+.a-smoke{transform-box:fill-box;transform-origin:center;animation:smoke 3s ease-out infinite}
+.a-train{animation:train 7s linear infinite}
+.a-fly{animation:fly 8s linear infinite}
+.a-chase{animation:chase 5s linear infinite}
+.a-leg1{transform-origin:0 0;animation:legs .3s ease-in-out infinite alternate}
+.a-leg2{transform-origin:0 0;animation:legs .3s ease-in-out infinite alternate-reverse}
+.a-panic1{transform-origin:0 0;animation:panic .18s ease-in-out infinite alternate}
+.a-panic2{transform-origin:0 0;animation:panic .18s ease-in-out infinite alternate-reverse}
+.a-reach1{transform-origin:0 0;animation:reach .3s ease-in-out infinite alternate}
+.a-reach2{transform-origin:0 0;animation:reach .3s ease-in-out infinite alternate-reverse}
+.a-run{animation:runbob .15s ease-in-out infinite alternate}
+.a-jump{animation:jump 1s cubic-bezier(.3,0,.4,1) infinite}
+.a-lid{transform-box:fill-box;transform-origin:center;animation:lid 1.6s ease-in-out infinite}
+.a-tb{animation:tb .25s ease-in-out infinite alternate}
+.a-hat{transform-origin:0 0;animation:hat .3s ease-in-out infinite alternate}
+@keyframes hat{from{transform:rotate(-6deg)}to{transform:rotate(5deg)}}
+@keyframes wave{from{transform:rotate(-25deg)}to{transform:rotate(15deg)}}
+@keyframes swing{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.25}}
+@keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+@keyframes steam{0%{transform:translateY(6px);opacity:0}30%{opacity:.85}100%{transform:translateY(-24px);opacity:0}}
+@keyframes waddle{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+@keyframes slide{0%{transform:translate(0,0);opacity:0}10%{opacity:1}85%{opacity:1}100%{transform:translate(190px,104px);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fall{0%{transform:translateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(55px);opacity:0}}
+@keyframes blinkeye{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes smoke{0%{transform:translate(0,0) scale(.6);opacity:.85}100%{transform:translate(-18px,-46px) scale(1.8);opacity:0}}
+@keyframes train{from{transform:translateX(-80px)}to{transform:translateX(300px)}}
+@keyframes fly{from{transform:translate(-150px,40px)}to{transform:translate(240px,-30px)}}
+@keyframes chase{from{transform:translateX(-215px)}to{transform:translateX(240px)}}
+@keyframes legs{from{transform:rotate(38deg)}to{transform:rotate(-38deg)}}
+@keyframes panic{from{transform:rotate(140deg)}to{transform:rotate(215deg)}}
+@keyframes reach{from{transform:rotate(-70deg)}to{transform:rotate(-108deg)}}
+@keyframes runbob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes lid{0%,55%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(0,-18px) rotate(-7deg)}}
+@keyframes tb{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+
+@media (prefers-reduced-motion: reduce){
+  .box.ready{animation:none;box-shadow:0 0 0 4px rgba(255,211,77,.7),0 10px 18px rgba(2,22,70,.35)}
+  .hint{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<canvas id="snow" aria-hidden="true"></canvas>
+<button class="admin-btn" type="button" id="adminBtn">Amministratore</button>
+
+<main class="page">
+  <header>
+    <h1>Il Calendario degli indizi</h1>
+    <div class="cd" aria-live="polite">
+      <p class="cd-label" id="cdLabel">Calcolo il tempo…</p>
+      <div class="cd-units" id="cdUnits">
+        <div class="unit"><b id="cdD">00</b><span>giorni</span></div>
+        <div class="unit"><b id="cdH">00</b><span>ore</span></div>
+        <div class="unit"><b id="cdM">00</b><span>minuti</span></div>
+        <div class="unit"><b id="cdS">00</b><span>secondi</span></div>
+      </div>
+    </div>
+    <p class="howto">Quando una scatola si illumina, trascina le forbici lungo lo scotch per tagliarlo.</p>
+  </header>
+
+  <div class="preview" id="preview" hidden>Modalità amministratore: tutte le scatole sono sbloccate per l’anteprima.<button type="button" id="resetBtn">Richiudi tutte</button></div>
+
+  <section class="grid" id="grid" aria-label="Scatole indizio"></section>
+
+  <footer>Ogni mattina alle 7:00, dal 1° al 25 dicembre, si sblocca una nuova scatola.</footer>
+</main>
+
+<div id="toast" role="status"></div>
+
+<div class="modal" id="modal" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="close" type="button" data-close aria-label="Chiudi">×</button>
+    <div class="m-scene" id="mScene"></div>
+    <p class="m-kicker" id="mKicker"></p>
+    <h2 id="mTitle"></h2>
+    <p class="m-text" id="mText"></p>
+  </div>
+</div>
+
+<div class="modal" id="login" hidden>
+  <div class="backdrop" data-close-login></div>
+  <form class="card login-card" id="loginForm" role="dialog" aria-modal="true" aria-labelledby="loginTitle" autocomplete="off">
+    <button class="close" type="button" data-close-login aria-label="Chiudi">×</button>
+    <h2 id="loginTitle">Area amministratore</h2>
+    <p class="sub">Inserisci la password per vedere tutte le scatole già sbloccate.</p>
+    <label for="pwd">Password</label>
+    <input type="password" id="pwd" name="pwd" autocomplete="off" required>
+    <p class="login-err" id="loginErr" role="alert"></p>
+    <button class="enter" type="submit">Entra</button>
+  </form>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURAZIONE — modifica qui titoli e testi degli indizi
+   ========================================================= */
+const CONFIG = {
+  oraApertura: 7,          // ogni scatola si apre alle 7:00
+  anno: null,              // null = anno in corso
+  scatole: [
+    { titolo: "Il pupazzo di neve",        indizio: "Primo indizio: scrivi qui il testo che vuoi svelare il 1° dicembre." },
+    { titolo: "Il pacco misterioso",        indizio: "Secondo indizio: scrivi qui il testo del 2 dicembre." },
+    { titolo: "La campana d’oro",           indizio: "Terzo indizio: scrivi qui il testo del 3 dicembre." },
+    { titolo: "La stella cometa",           indizio: "Quarto indizio: scrivi qui il testo del 4 dicembre." },
+    { titolo: "Il bastoncino di zucchero",  indizio: "Quinto indizio: scrivi qui il testo del 5 dicembre." },
+    { titolo: "L’albero illuminato",        indizio: "Sesto indizio: scrivi qui il testo del 6 dicembre." },
+    { titolo: "L’omino di pan di zenzero",  indizio: "Settimo indizio: scrivi qui il testo del 7 dicembre." },
+    { titolo: "La pallina che dondola",     indizio: "Ottavo indizio: scrivi qui il testo dell’8 dicembre." },
+    { titolo: "La candela accesa",          indizio: "Nono indizio: scrivi qui il testo del 9 dicembre." },
+    { titolo: "La cioccolata calda",        indizio: "Decimo indizio: scrivi qui il testo del 10 dicembre." },
+    { titolo: "La renna dal naso rosso",    indizio: "Undicesimo indizio: scrivi qui il testo dell’11 dicembre." },
+    { titolo: "La calza appesa",            indizio: "Dodicesimo indizio: scrivi qui il testo del 12 dicembre." },
+    { titolo: "La palla di neve",           indizio: "Tredicesimo indizio: scrivi qui il testo del 13 dicembre." },
+    { titolo: "Il pinguino ballerino",      indizio: "Quattordicesimo indizio: scrivi qui il testo del 14 dicembre." },
+    { titolo: "La slitta in discesa",       indizio: "Quindicesimo indizio: scrivi qui il testo del 15 dicembre." },
+    { titolo: "La luna d’inverno",          indizio: "Sedicesimo indizio: scrivi qui il testo del 16 dicembre." },
+    { titolo: "La ghirlanda",               indizio: "Diciassettesimo indizio: scrivi qui il testo del 17 dicembre." },
+    { titolo: "Le muffole",                 indizio: "Diciottesimo indizio: scrivi qui il testo del 18 dicembre." },
+    { titolo: "Il gufo della notte",        indizio: "Diciannovesimo indizio: scrivi qui il testo del 19 dicembre." },
+    { titolo: "La casetta col camino",      indizio: "Ventesimo indizio: scrivi qui il testo del 20 dicembre." },
+    { titolo: "Il trenino dei regali",      indizio: "Ventunesimo indizio: scrivi qui il testo del 21 dicembre." },
+    { titolo: "Il fiocco di neve",          indizio: "Ventiduesimo indizio: scrivi qui il testo del 22 dicembre." },
+    { titolo: "Le luci di festa",           indizio: "Ventitreesimo indizio: scrivi qui il testo del 23 dicembre." },
+    { titolo: "La slitta nel cielo",        indizio: "Ventiquattresimo indizio: scrivi qui il testo del 24 dicembre." },
+    { titolo: "Inseguimento sulla neve!",   indizio: "Gli elfi hanno perso il controllo di uno pneumatico… L’indizio finale: scrivi qui il testo del 25 dicembre." }
+  ]
+};
+
+const COLORS = ["#e63946","#f4a261","#2a9d8f","#e9b949","#8e44ad","#1d8f4e","#ff6fa8","#3a86ff","#fb5607","#06a77d",
+                "#b5179e","#ffbe0b","#7b2cbf","#00b4d8","#d62828","#43aa8b","#f15bb5","#5e60ce","#ff9f1c","#2b9348",
+                "#c9184a","#0077b6","#e76f51","#9c6644","#d4a017"];
+
+const BINS = 20;
+const YEAR = CONFIG.anno || new Date().getFullYear();
+const ADMIN_HASH = "6bdf0b2dfc2e0221960849943e884b3d4c6baf7cd25286caee29b9737ab3a343";
+let preview = (() => { try { return sessionStorage.getItem("calendario-admin") === "1"; } catch(e){ return false; } })();
+let opened = new Set();
+let justCutAt = 0;
+let lastNext;
+const boxes = [];
+
+/* ---------- Tempo ---------- */
+const unlockAt = d => new Date(YEAR, 11, d, CONFIG.oraApertura, 0, 0);
+const openable = d => preview || Date.now() >= unlockAt(d).getTime();
+const pad = n => String(n).padStart(2, "0");
+
+/* ---------- Memoria locale ---------- */
+const storeKey = () => "calendario-indizi-" + YEAR + (preview ? "-anteprima" : "");
+function loadOpened(){
+  try { const v = JSON.parse(localStorage.getItem(storeKey()) || "[]"); return new Set(Array.isArray(v) ? v : []); }
+  catch(e){ return new Set(); }
+}
+function saveOpened(){
+  try { localStorage.setItem(storeKey(), JSON.stringify([...opened])); } catch(e){}
+}
+
+/* ---------- Disegni ---------- */
+function rand(seed){ let s = seed * 9301 + 49297; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+function star(cx, cy, R, fill, cls = "", delay = 0){
+  const p = [];
+  for (let i = 0; i < 10; i++){
+    const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? R * .45 : R;
+    p.push((cx + Math.cos(a) * rr).toFixed(1) + "," + (cy + Math.sin(a) * rr).toFixed(1));
+  }
+  return `<polygon points="${p.join(" ")}" fill="${fill}" class="${cls}" style="animation-delay:${delay}s"/>`;
+}
+function skyStars(seed, n, maxY = 120, color = "#fff"){
+  const r = rand(seed); let s = "";
+  for (let i = 0; i < n; i++) s += `<circle cx="${(r()*200).toFixed(0)}" cy="${(r()*maxY).toFixed(0)}" r="${(r()*1.6+.6).toFixed(1)}" fill="${color}" class="a-twinkle" style="animation-delay:${(r()*1.4).toFixed(2)}s"/>`;
+  return s;
+}
+const ground = (y = 172, c = "#fff") => `<path d="M0 ${y} Q50 ${y-12} 100 ${y} T200 ${y} V200 H0Z" fill="${c}"/>`;
+const svg = (bg, body) => `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="200" fill="${bg}"/>${body}</svg>`;
+
+function elf(o){
+  const O = "#3a2340", skin = "#ffd9b8";
+  const st = `stroke="${O}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"`;
+  /* gamba morbida con calza a righe e scarpetta arricciata */
+  const leg = (cls, sock) => `<g class="${cls}">
+    <path d="M0 0 Q3.5 7 0 14" stroke="${O}" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <path d="M0 0 Q3.5 7 0 14" stroke="${sock}" stroke-width="5.8" fill="none" stroke-linecap="round"/>
+    <path d="M0 1 Q3.5 7 0 13" stroke="#fff" stroke-width="5.8" fill="none" stroke-dasharray="2.4 3.2"/>
+    <path d="M17 13 q5 -5 1 -9" stroke="${O}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M17 13 q5 -5 1 -9" stroke="#9a5326" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M-5 13 Q-7 21 3 21 Q14 21 17.5 13 Q11 15 5 11.5 Q0 10 -5 13 Z" fill="#9a5326" ${st}/>
+    <path d="M-3 15.5 Q0 13.5 4 14" stroke="rgba(255,255,255,.35)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <circle cx="18" cy="3.5" r="2.4" fill="#ffd34d" ${st}/>
+  </g>`;
+  /* braccio a manica morbida con manina tonda */
+  const arm = cls => `<g transform="translate(0 -17)"><g class="${cls}">
+    <path d="M0 0 Q3.5 7 0 13" stroke="${O}" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M0 0 Q3.5 7 0 13" stroke="${o.tunic}" stroke-width="5.2" fill="none" stroke-linecap="round"/>
+    <circle cx="0" cy="15.5" r="4.4" fill="${skin}" ${st}/>
+    <path d="M-3.6 13.5 q-2.4 1.6 -1.2 4" stroke="${O}" stroke-width="1.2" fill="${skin}"/>
+  </g></g>`;
+  const face = o.scared
+    ? `<ellipse cx="0" cy="-40" rx="4.4" ry="5.6" fill="#fff" ${st}/><ellipse cx="10.5" cy="-40" rx="4.4" ry="5.6" fill="#fff" ${st}/>
+       <circle cx="-1.6" cy="-39.2" r="2.5" fill="#2a1a2a"/><circle cx="8.9" cy="-39.2" r="2.5" fill="#2a1a2a"/>
+       <circle cx="-2.3" cy="-40.3" r=".95" fill="#fff"/><circle cx="8.2" cy="-40.3" r=".95" fill="#fff"/>
+       <path d="M-4.5 -46.6 Q-1 -50 3 -47.4 M7 -47.6 Q11 -50.4 14.6 -46.8" stroke="${O}" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+       <path d="M3 -27 Q8 -29.5 13 -27 Q12.6 -19.6 8 -19.6 Q3.4 -19.6 3 -27Z" fill="#7a1f35" ${st}/>
+       <path d="M5.4 -21.6 Q8 -24 10.6 -21.6 Q8 -20.2 5.4 -21.6Z" fill="#ff8fa3"/>
+       <path d="M5 -26.6 h6" stroke="#fff" stroke-width="1.6"/>
+       <path d="M-17 -55 q-3.4 5 0 7.4 q3.4 -2.4 0 -7.4z" fill="#9fdcff" stroke="#3a7ab8" stroke-width=".8" class="a-twinkle"/>
+       <path d="M-21 -47 q-2.4 3.6 0 5.4 q2.4 -1.8 0 -5.4z" fill="#9fdcff" stroke="#3a7ab8" stroke-width=".8" class="a-twinkle" style="animation-delay:.5s"/>`
+    : `<ellipse cx="0" cy="-40" rx="4.1" ry="4.9" fill="#fff" ${st}/><ellipse cx="10.5" cy="-40" rx="4.1" ry="4.9" fill="#fff" ${st}/>
+       <circle cx="1.3" cy="-39.4" r="2.5" fill="#2a1a2a"/><circle cx="11.8" cy="-39.4" r="2.5" fill="#2a1a2a"/>
+       <circle cx="2" cy="-40.4" r=".95" fill="#fff"/><circle cx="12.5" cy="-40.4" r=".95" fill="#fff"/>
+       <path d="M-5 -47 Q-1 -47 3.4 -44.6 M7.4 -44.6 Q11.6 -47.2 15.6 -47.2" stroke="${O}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+       <path d="M2 -28 Q8 -26 14 -29 Q12.6 -20 7.6 -20.4 Q3 -21 2 -28Z" fill="#7a1f35" ${st}/>
+       <path d="M3.6 -27.3 Q8 -25.8 12.6 -28 L12.2 -25.8 Q8 -24 4 -25.4Z" fill="#fff"/>
+       <path d="M6 -21.4 Q8.6 -23.4 11 -22 Q9 -20.4 6 -21.4Z" fill="#ff8fa3"/>`;
+  return `<g transform="translate(${o.x} ${o.y}) scale(${o.s || .8}) rotate(${o.lean || 0})"><g class="a-run">
+    ${arm(o.scared ? "a-panic2" : "a-reach2")}
+    ${leg("a-leg2", o.sock2)}
+    ${leg("a-leg1", o.sock1)}
+    <path d="M-14.5 -1 Q-13 10 -8 6 Q-4 12 0 7 Q4 12 8 6 Q13 10 14.5 -1 Z" fill="${o.tunic2}" ${st}/>
+    <path d="M-11 -20 C-17 -10 -18 0 -13 4 C-6 8 6 8 13 4 C18 0 17 -10 11 -20 C6 -25 -6 -25 -11 -20 Z" fill="${o.tunic}" ${st}/>
+    <path d="M-8 -16 Q-11.5 -11 -11 -6" stroke="rgba(255,255,255,.35)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M-15.6 -8 Q0 -2 15.6 -8 L15.9 -3 Q0 3 -15.9 -3 Z" fill="#4a2a14" ${st}/>
+    <rect x="-3.6" y="-7.6" width="7.2" height="6.6" rx="1.8" fill="none" stroke="#ffd34d" stroke-width="1.9"/>
+    <path d="M-11 -21 Q-9 -13 -4 -17 Q0 -11 4 -17 Q9 -13 11 -21 Q0 -27 -11 -21Z" fill="${o.collar}" ${st}/>
+    <path d="M-9 -40 C-17 -43 -24 -50 -28 -50 C-25 -42 -18 -33 -9 -33 Z" fill="${skin}" ${st}/>
+    <path d="M-11 -39 C-17 -42 -21 -46 -24 -47 C-21 -41 -16 -36 -11 -35Z" fill="#ffb3a7"/>
+    <path d="M15 -40 C23 -43 30 -50 34 -50 C31 -42 24 -33 15 -33 Z" fill="${skin}" ${st}/>
+    <path d="M17 -39 C23 -42 27 -46 30 -47 C27 -41 22 -36 17 -35Z" fill="#ffb3a7"/>
+    <path d="M-10 -46 q-6 3 -4 8 q-5 2 -2 7 q4 1 6 -3 Z" fill="#e07b39" ${st}/>
+    <ellipse cx="3" cy="-38" rx="15.5" ry="15" fill="${skin}" ${st}/>
+    <ellipse cx="-4.5" cy="-31" rx="3.6" ry="2.4" fill="#ff8fa3" opacity=".6"/><ellipse cx="14" cy="-31" rx="3.2" ry="2.4" fill="#ff8fa3" opacity=".6"/>
+    <circle cx="-6" cy="-33" r=".6" fill="#c97a52"/><circle cx="-3.6" cy="-32" r=".6" fill="#c97a52"/><circle cx="-5" cy="-30.4" r=".6" fill="#c97a52"/>
+    ${face}
+    <ellipse cx="9" cy="-33" rx="3.6" ry="3" fill="#f7957c" ${st}/><circle cx="8" cy="-34.1" r=".9" fill="#fff" opacity=".8"/>
+    <g transform="translate(3 -55)"><g class="a-hat"><g transform="translate(-3 50)">
+      <path d="M-13 -46 Q3 -58 19 -46 C16 -58 6 -66 -4 -72 C-12 -77 -22 -80 -30 -74 C-34 -71 -33 -65 -30 -64 C-27 -70 -20 -70 -16 -65 C-12 -60 -12 -52 -13 -46 Z" fill="${o.hat}" ${st}/>
+      <path d="M8 -56 C2 -62 -6 -67 -12 -70" stroke="rgba(255,255,255,.32)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <circle cx="-30" cy="-60.5" r="4.6" fill="#ffd34d" ${st}/><path d="M-32.6 -59.6 h5.2" stroke="${O}" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M-16 -43 Q3 -57 22 -43 Q23.5 -39 20 -38 Q3 -50 -14 -38 Q-17.5 -39 -16 -43Z" fill="#fff" ${st}/>
+    </g></g></g>
+    ${arm(o.scared ? "a-panic1" : "a-reach1")}
+  </g></g>`;
+}
+function tire(){
+  let spokes = "";
+  for (const a of [0,72,144,216,288]) spokes += `<line x1="0" y1="0" x2="0" y2="-10" stroke="#8a919c" stroke-width="2.6" stroke-linecap="round" transform="rotate(${a})"/>`;
+  return `<g class="a-spinfast"><circle r="22" fill="#1e1e24"/><circle r="19" fill="none" stroke="#45454d" stroke-width="5" stroke-dasharray="4 3.5"/><circle r="11.5" fill="#c9ced6" stroke="#8a919c" stroke-width="2"/>${spokes}<circle r="3.6" fill="#555"/><path d="M-15 -12 a19 19 0 0 1 10 -6" stroke="rgba(255,255,255,.35)" stroke-width="2" fill="none" stroke-linecap="round"/></g>`;
+}
+
+function scene(d){
+  switch(d){
+  case 1: return svg("#cfe8ff", `${ground(170)}
+    <circle cx="100" cy="148" r="36" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
+    <circle cx="100" cy="100" r="27" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
+    <circle cx="100" cy="63" r="20" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
+    <line x1="75" y1="98" x2="48" y2="80" stroke="#6b3e1f" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(125 98)"><g class="a-wave"><line x1="0" y1="0" x2="30" y2="-22" stroke="#6b3e1f" stroke-width="4" stroke-linecap="round"/><line x1="22" y1="-16" x2="31" y2="-8" stroke="#6b3e1f" stroke-width="3" stroke-linecap="round"/></g></g>
+    <circle cx="93" cy="59" r="2.8" fill="#222"/><circle cx="107" cy="59" r="2.8" fill="#222"/>
+    <path d="M100 65 L122 69 L100 71 Z" fill="#ff8c1a"/>
+    <path d="M92 74 q8 5 16 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="81" y="80" width="38" height="8" rx="4" fill="#e63946"/><rect x="104" y="83" width="8" height="22" rx="3" fill="#e63946"/>
+    <circle cx="100" cy="96" r="3" fill="#333"/><circle cx="100" cy="108" r="3" fill="#333"/><circle cx="100" cy="140" r="3" fill="#333"/>
+    <rect x="84" y="22" width="32" height="24" rx="2" fill="#222"/><rect x="76" y="44" width="48" height="6" rx="3" fill="#222"/><rect x="84" y="37" width="32" height="5" fill="#e63946"/>`);
+  case 2: return svg("#ffe3e8", `
+    ${star(40,50,9,"#ffbe0b","a-twinkle",0)}${star(160,40,7,"#ffbe0b","a-twinkle",.5)}${star(165,110,6,"#ff6fa8","a-twinkle",.9)}${star(35,120,6,"#ff6fa8","a-twinkle",.3)}
+    <ellipse cx="100" cy="174" rx="55" ry="7" fill="rgba(0,0,0,.08)"/>
+    <rect x="55" y="104" width="90" height="68" rx="4" fill="#e63946"/><rect x="93" y="104" width="14" height="68" fill="#ffd34d"/>
+    <g class="a-lid"><rect x="48" y="86" width="104" height="22" rx="4" fill="#c1121f"/><rect x="93" y="86" width="14" height="22" fill="#ffd34d"/>
+    <ellipse cx="85" cy="80" rx="15" ry="9" fill="none" stroke="#ffd34d" stroke-width="6"/><ellipse cx="115" cy="80" rx="15" ry="9" fill="none" stroke="#ffd34d" stroke-width="6"/><circle cx="100" cy="83" r="7" fill="#f4b400"/></g>`);
+  case 3: return svg("#fff1c9", `
+    <g transform="translate(100 40)"><g class="a-swing">
+      <line x1="0" y1="-45" x2="0" y2="16" stroke="#b3802a" stroke-width="3"/>
+      <circle cx="0" cy="100" r="9" fill="#9a6400"/>
+      <path d="M-38 92 Q-30 84 -28 60 Q-24 20 0 18 Q24 20 28 60 Q30 84 38 92 Z" fill="#f4b400" stroke="#c98f00" stroke-width="3"/>
+      <rect x="-42" y="88" width="84" height="9" rx="4.5" fill="#e0a100"/>
+      <path d="M-16 34 Q-22 56 -22 80" stroke="rgba(255,255,255,.55)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-10" cy="18" rx="12" ry="6" fill="#1d8f4e" transform="rotate(-25 -10 18)"/><ellipse cx="10" cy="18" rx="12" ry="6" fill="#1d8f4e" transform="rotate(25 10 18)"/>
+      <circle cx="-3" cy="14" r="4" fill="#e63946"/><circle cx="4" cy="12" r="4" fill="#e63946"/>
+    </g></g>`);
+  case 4: return svg("#1b2a6b", `${skyStars(4, 26, 200)}
+    <circle cx="100" cy="100" r="62" fill="#ffd34d" opacity=".12" class="a-pulse"/>
+    ${star(100,102,58,"#ffd34d","a-pulse",0)}
+    <path d="M78 96 q4 -4 8 0 M114 96 q4 -4 8 0" stroke="#7a4a00" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M90 110 q10 9 20 0" stroke="#7a4a00" stroke-width="3" fill="none" stroke-linecap="round"/>
+    ${star(40,40,8,"#fff","a-twinkle",.3)}${star(165,55,6,"#fff","a-twinkle",.8)}${star(160,165,7,"#fff","a-twinkle",.1)}`);
+  case 5: return svg("#e8fff4", `${ground(176,"#fff")}
+    ${star(45,50,7,"#2a9d8f","a-twinkle",.2)}${star(160,70,6,"#2a9d8f","a-twinkle",.7)}
+    <g transform="translate(120 172)"><g class="a-swing" style="animation-duration:2.4s">
+      <path d="M0 0 L0 -100 A26 26 0 0 0 -52 -100 L-52 -92" stroke="#dadada" stroke-width="24" fill="none" stroke-linecap="round"/>
+      <path d="M0 0 L0 -100 A26 26 0 0 0 -52 -100 L-52 -92" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round"/>
+      <path d="M0 0 L0 -100 A26 26 0 0 0 -52 -100 L-52 -92" stroke="#e63946" stroke-width="20" fill="none" stroke-dasharray="12 12"/>
+    </g></g>`);
+  case 6: {
+    const r = rand(6); let lights = ""; const cols = ["#ffd34d","#ff6fa8","#00b4d8","#fb5607","#fff"];
+    const spots = [[90,72],[112,82],[80,108],[104,118],[126,112],[70,148],[95,150],[120,146],[142,150]];
+    spots.forEach((p,i)=> lights += `<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${cols[i%5]}" class="a-blink" style="animation-delay:${(r()).toFixed(2)}s"/>`);
+    return svg("#dff3ff", `${ground(176)}
+      <rect x="92" y="160" width="16" height="22" fill="#7a4a22"/>
+      <polygon points="100,104 172,172 28,172" fill="#1d8f4e"/><polygon points="100,72 158,136 42,136" fill="#22a35a"/><polygon points="100,42 145,102 55,102" fill="#2bb565"/>
+      ${lights}${star(100,40,15,"#ffd34d","a-pulse",0)}`);
+  }
+  case 7: return svg("#fff0dc", `<ellipse cx="100" cy="182" rx="40" ry="6" fill="rgba(0,0,0,.1)"/>
+    <g class="a-jump">
+      <rect x="50" y="88" width="100" height="20" rx="10" fill="#c8783a"/>
+      <rect x="76" y="126" width="18" height="48" rx="9" fill="#c8783a"/><rect x="106" y="126" width="18" height="48" rx="9" fill="#c8783a"/>
+      <rect x="76" y="80" width="48" height="64" rx="20" fill="#c8783a"/>
+      <circle cx="100" cy="62" r="24" fill="#c8783a"/>
+      <circle cx="92" cy="58" r="3.2" fill="#fff"/><circle cx="108" cy="58" r="3.2" fill="#fff"/>
+      <path d="M90 70 q10 8 20 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="100" cy="98" r="4" fill="#e63946"/><circle cx="100" cy="114" r="4" fill="#3a86ff"/><circle cx="100" cy="130" r="4" fill="#2bb565"/>
+      <path d="M56 92 q3 6 0 12 M144 92 q-3 6 0 12 M78 166 q8 -3 14 0 M108 166 q8 -3 14 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>`);
+  case 8: return svg("#eadcff", `${star(40,150,7,"#fff","a-twinkle",.2)}${star(165,140,6,"#fff","a-twinkle",.6)}
+    <g transform="translate(100 0)"><g class="a-swing">
+      <line x1="0" y1="0" x2="0" y2="70" stroke="#8a7aa8" stroke-width="2"/>
+      <rect x="-11" y="68" width="22" height="12" rx="2" fill="#c9a227"/>
+      <circle cx="0" cy="122" r="44" fill="#7b2cbf"/>
+      <polyline points="-42,112 -30,100 -18,112 -6,100 6,112 18,100 30,112 42,100" stroke="#ffd34d" stroke-width="5" fill="none" stroke-linejoin="round"/>
+      <polyline points="-42,138 -30,126 -18,138 -6,126 6,138 18,126 30,138 42,126" stroke="#ff6fa8" stroke-width="5" fill="none" stroke-linejoin="round"/>
+      <ellipse cx="-16" cy="96" rx="10" ry="6" fill="#fff" opacity=".45"/>
+    </g></g>`);
+  case 9: return svg("#2b1d3f", `${skyStars(9, 12, 80)}
+    <circle cx="100" cy="70" r="46" fill="#ffcf5a" opacity=".22" class="a-pulse"/>
+    <ellipse cx="100" cy="178" rx="44" ry="9" fill="#c9a227"/>
+    <rect x="80" y="96" width="40" height="82" rx="4" fill="#f1faee"/>
+    <path d="M80 104 q6 14 10 0 q4 22 10 0 q6 12 10 0 q5 18 10 0 V96 H80Z" fill="#e63946"/>
+    <line x1="100" y1="96" x2="100" y2="88" stroke="#333" stroke-width="2"/>
+    <g transform="translate(100 90)"><path class="a-flicker" d="M0 0 C-12 -10 -8 -26 0 -42 C8 -26 12 -10 0 0 Z" fill="#ffb703"/></g>
+    <g transform="translate(100 88)"><path class="a-flicker" d="M0 0 C-6 -6 -4 -14 0 -22 C4 -14 6 -6 0 0 Z" fill="#fff3b0" style="animation-delay:.1s"/></g>`);
+  case 10: return svg("#ffe9d6", `
+    <path class="a-steam" d="M82 80 q-8 -12 0 -24 q8 -12 0 -24" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path class="a-steam" style="animation-delay:.8s" d="M98 80 q-8 -12 0 -24 q8 -12 0 -24" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path class="a-steam" style="animation-delay:1.6s" d="M114 80 q-8 -12 0 -24 q8 -12 0 -24" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="98" cy="176" rx="56" ry="8" fill="rgba(0,0,0,.08)"/>
+    <path d="M132 108 q30 0 30 24 q0 24 -30 24" stroke="#c1121f" stroke-width="10" fill="none"/>
+    <rect x="60" y="88" width="76" height="86" rx="12" fill="#e63946"/>
+    <ellipse cx="98" cy="92" rx="36" ry="8" fill="#6b3e1f"/>
+    <rect x="80" y="84" width="12" height="10" rx="3" fill="#fff"/><rect x="100" y="82" width="12" height="10" rx="3" fill="#ffd1dc"/>
+    ${star(98,132,14,"#fff","",0)}`);
+  case 11: return svg("#e0f7ff", `${ground(184)}
+    <path d="M78 70 L66 36 M71 52 L54 46 M66 36 L58 20 M66 36 L78 22" stroke="#8b5a2b" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M122 70 L134 36 M129 52 L146 46 M134 36 L142 20 M134 36 L122 22" stroke="#8b5a2b" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <ellipse cx="62" cy="88" rx="16" ry="8" fill="#a0673a" transform="rotate(-25 62 88)"/><ellipse cx="138" cy="88" rx="16" ry="8" fill="#a0673a" transform="rotate(25 138 88)"/>
+    <ellipse cx="100" cy="112" rx="42" ry="50" fill="#a0673a"/>
+    <ellipse cx="100" cy="142" rx="28" ry="22" fill="#d9a374"/>
+    <circle cx="86" cy="100" r="6" fill="#2a1a10"/><circle cx="114" cy="100" r="6" fill="#2a1a10"/><circle cx="88" cy="98" r="2" fill="#fff"/><circle cx="116" cy="98" r="2" fill="#fff"/>
+    <circle cx="100" cy="130" r="20" fill="#ff3b3b" opacity=".35" class="a-pulse"/>
+    <circle cx="100" cy="130" r="12" fill="#e63946"/><circle cx="96" cy="126" r="3.5" fill="#fff" opacity=".7"/>
+    <path d="M90 150 q10 7 20 0" stroke="#6b3e1f" stroke-width="3" fill="none" stroke-linecap="round"/>`);
+  case 12: return svg("#e9f9ee", `<circle cx="100" cy="20" r="4" fill="#888"/>
+    <g transform="translate(100 20)"><g class="a-swing" style="animation-duration:1.8s">
+      <path d="M-4 0 L-4 16 M4 0 L4 16" stroke="#c9a227" stroke-width="2"/>
+      <path d="M-22 30 L22 30 L22 104 Q22 122 40 130 Q62 140 52 160 Q42 178 10 164 L-14 150 Q-24 142 -22 122 Z" fill="#e63946"/>
+      <rect x="-28" y="14" width="56" height="24" rx="9" fill="#fff"/>
+      ${star(0,80,12,"#ffd34d","",0)}
+      <path d="M-20 70 h40 M-20 96 h40" stroke="#1d8f4e" stroke-width="5"/>
+    </g></g>`);
+  case 13: {
+    const r = rand(13); let flakes = "";
+    for (let i = 0; i < 16; i++) flakes += `<circle cx="${(62 + r()*76).toFixed(0)}" cy="${(42 + r()*40).toFixed(0)}" r="${(r()*1.5+1.2).toFixed(1)}" fill="#fff" class="a-fall" style="animation-delay:${(r()*3).toFixed(2)}s"/>`;
+    return svg("#d7ecff", `
+      <path d="M58 150 L142 150 L154 186 L46 186 Z" fill="#8b5a2b"/><rect x="40" y="182" width="120" height="8" rx="4" fill="#6b3e1f"/>
+      <circle cx="100" cy="92" r="62" fill="#bfe3ff"/>
+      <ellipse cx="100" cy="134" rx="52" ry="16" fill="#fff"/>
+      <rect x="82" y="104" width="26" height="22" fill="#e76f51"/><polygon points="78,106 95,90 112,106" fill="#9c2f1f"/><rect x="91" y="114" width="8" height="12" fill="#5a2a12"/>
+      <polygon points="128,126 140,96 152,126" fill="#1d8f4e"/><polygon points="58,126 66,108 74,126" fill="#2bb565"/>
+      ${flakes}
+      <circle cx="100" cy="92" r="62" fill="none" stroke="#fff" stroke-width="4" opacity=".8"/>
+      <path d="M62 64 a48 48 0 0 1 28 -22" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" opacity=".7"/>`);
+  }
+  case 14: return svg("#d8f1ff", `${ground(180,"#f3fbff")}
+    <g transform="translate(100 178)"><g class="a-waddle">
+      <ellipse cx="-14" cy="-3" rx="11" ry="5" fill="#ff9f1c"/><ellipse cx="14" cy="-3" rx="11" ry="5" fill="#ff9f1c"/>
+      <ellipse cx="0" cy="-60" rx="38" ry="55" fill="#1d2433"/>
+      <ellipse cx="0" cy="-50" rx="26" ry="42" fill="#fff"/>
+      <path d="M-36 -74 Q-56 -44 -34 -26 Z" fill="#1d2433"/><path d="M36 -74 Q56 -44 34 -26 Z" fill="#1d2433"/>
+      <circle cx="-11" cy="-90" r="7" fill="#fff"/><circle cx="11" cy="-90" r="7" fill="#fff"/>
+      <circle cx="-10" cy="-89" r="3.2" fill="#111"/><circle cx="12" cy="-89" r="3.2" fill="#111"/>
+      <polygon points="-7,-81 7,-81 0,-71" fill="#ff9f1c"/>
+      <circle cx="-18" cy="-76" r="4" fill="#ff9aa8" opacity=".7"/><circle cx="18" cy="-76" r="4" fill="#ff9aa8" opacity=".7"/>
+      <path d="M-28 -104 Q0 -130 28 -104 Z" fill="#e63946"/><circle cx="0" cy="-122" r="6" fill="#fff"/><rect x="-30" y="-108" width="60" height="8" rx="4" fill="#fff"/>
+    </g></g>`);
+  case 15: return svg("#cfe8ff", `${skyStars(15,0)}
+    <path d="M0 60 L200 170 L200 200 L0 200 Z" fill="#fff"/>
+    <polygon points="150,120 162,92 174,126" fill="#1d8f4e"/><polygon points="40,64 50,40 60,70" fill="#2bb565"/>
+    <g transform="translate(14 46)"><g class="a-slide"><g transform="rotate(28.8)">
+      <path d="M-24 6 L24 6 Q34 6 34 -4" stroke="#c9a227" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <rect x="-20" y="-8" width="40" height="10" rx="3" fill="#e63946"/>
+      <rect x="-12" y="-26" width="20" height="18" rx="2" fill="#3a86ff"/><rect x="-4" y="-26" width="4" height="18" fill="#ffd34d"/>
+      <line x1="-14" y1="2" x2="-14" y2="6" stroke="#c9a227" stroke-width="3"/><line x1="14" y1="2" x2="14" y2="6" stroke="#c9a227" stroke-width="3"/>
+    </g></g></g>`);
+  case 16: return svg("#10204f", `${skyStars(16, 30, 200)}
+    <circle cx="108" cy="92" r="52" fill="#fff3b0"/><circle cx="132" cy="76" r="48" fill="#10204f"/>
+    <circle cx="80" cy="88" r="3" fill="#7a6a30"/><path d="M76 104 q6 5 12 1" stroke="#7a6a30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M60 70 q-6 -18 8 -30 l20 6 z" fill="#e63946"/><circle cx="56" cy="38" r="5" fill="#fff"/>
+    ${star(160,140,7,"#ffd34d","a-twinkle",.2)}${star(40,150,6,"#ffd34d","a-twinkle",.7)}`);
+  case 17: {
+    let berries = "";
+    for (let i = 0; i < 9; i++){ const a = i / 9 * Math.PI * 2; berries += `<circle cx="${(100+Math.cos(a)*55).toFixed(1)}" cy="${(96+Math.sin(a)*55).toFixed(1)}" r="5" fill="#e63946"/>`; }
+    return svg("#fff3e0", `<g class="a-pulse">
+      <circle cx="100" cy="96" r="55" fill="none" stroke="#1d8f4e" stroke-width="28"/>
+      <circle cx="100" cy="96" r="55" fill="none" stroke="#2bb565" stroke-width="16" stroke-dasharray="6 9"/>
+      <circle cx="100" cy="96" r="44" fill="none" stroke="#14703c" stroke-width="5" stroke-dasharray="3 7"/>
+      ${berries}
+      <path d="M100 152 L76 140 L78 164 Z M100 152 L124 140 L122 164 Z" fill="#e63946"/>
+      <path d="M96 156 L86 186 L94 182 L98 160 Z M104 156 L114 186 L106 182 L102 160 Z" fill="#c1121f"/>
+      <circle cx="100" cy="152" r="7" fill="#c1121f"/></g>`);
+  }
+  case 18: {
+    const mitt = (x, y, c, delay) => `<g transform="translate(${x} ${y})"><g class="a-swing" style="animation-duration:1.7s;animation-delay:${delay}s">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#e63946" stroke-width="3"/>
+      <ellipse cx="-20" cy="48" rx="8" ry="14" fill="${c}" transform="rotate(-20 -20 48)"/>
+      <path d="M-18 22 L18 22 L20 62 Q20 86 0 86 Q-20 86 -20 62 Z" fill="${c}"/>
+      <rect x="-19" y="8" width="38" height="16" rx="5" fill="#fff"/>
+      ${star(0,56,9,"#fff","",0)}</g></g>`;
+    return svg("#e3f2ff", `<path d="M20 40 Q100 80 180 40" stroke="#e63946" stroke-width="3" fill="none"/>
+      ${mitt(60,55,"#3a86ff",0)}${mitt(140,55,"#e63946",.5)}
+      ${star(100,150,6,"#3a86ff","a-twinkle",.3)}${star(30,140,5,"#e63946","a-twinkle",.9)}${star(170,150,5,"#3a86ff","a-twinkle",.5)}`);
+  }
+  case 19: return svg("#20305f", `${skyStars(19, 22, 120)}<circle cx="160" cy="40" r="16" fill="#fff3b0"/>
+    <path d="M0 168 Q100 156 200 172" stroke="#6b3e1f" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <polygon points="72,72 80,52 92,70" fill="#8d5a3b"/><polygon points="128,72 120,52 108,70" fill="#8d5a3b"/>
+    <ellipse cx="100" cy="114" rx="40" ry="50" fill="#8d5a3b"/>
+    <ellipse cx="100" cy="128" rx="26" ry="32" fill="#d9b48f"/>
+    <path d="M88 118 l6 6 l6 -6 l6 6 l6 -6 M88 132 l6 6 l6 -6 l6 6 l6 -6" stroke="#a87a55" stroke-width="2" fill="none"/>
+    <g class="a-blinkeye"><circle cx="84" cy="96" r="15" fill="#fff"/><circle cx="116" cy="96" r="15" fill="#fff"/><circle cx="86" cy="98" r="7" fill="#222"/><circle cx="114" cy="98" r="7" fill="#222"/><circle cx="88" cy="95" r="2" fill="#fff"/><circle cx="116" cy="95" r="2" fill="#fff"/></g>
+    <polygon points="94,108 106,108 100,120" fill="#ff9f1c"/>
+    <path d="M84 162 l-4 8 M90 162 l0 9 M110 162 l0 9 M116 162 l4 8" stroke="#ff9f1c" stroke-width="3" stroke-linecap="round"/>`);
+  case 20: return svg("#1e3a7a", `${skyStars(20, 20, 90)}${ground(176)}
+    <rect x="120" y="58" width="16" height="34" fill="#7a3b2a"/><rect x="117" y="54" width="22" height="8" fill="#fff"/>
+    <circle cx="128" cy="48" r="7" fill="#dfe7f5" class="a-smoke"/><circle cx="128" cy="48" r="7" fill="#dfe7f5" class="a-smoke" style="animation-delay:1s"/><circle cx="128" cy="48" r="7" fill="#dfe7f5" class="a-smoke" style="animation-delay:2s"/>
+    <rect x="50" y="102" width="100" height="72" fill="#c0392b"/>
+    <polygon points="40,106 100,56 160,106" fill="#5b2c1d"/>
+    <path d="M40 106 L100 56 L160 106 L152 106 Q140 100 128 108 Q114 98 100 106 Q84 98 70 108 Q58 100 48 106Z" fill="#fff"/>
+    <rect x="62" y="118" width="24" height="22" rx="2" fill="#ffd34d" class="a-pulse"/><rect x="114" y="118" width="24" height="22" rx="2" fill="#ffd34d" class="a-pulse" style="animation-delay:.6s"/>
+    <path d="M74 118 v22 M62 129 h24 M126 118 v22 M114 129 h24" stroke="#c0392b" stroke-width="2"/>
+    <rect x="90" y="144" width="20" height="30" rx="3" fill="#5b2c1d"/><circle cx="105" cy="160" r="2" fill="#ffd34d"/>`);
+  case 21: {
+    const wheel = (x, y) => `<g transform="translate(${x} ${y})"><g class="a-spinfast"><circle r="9" fill="#333"/><line x1="-8" y1="0" x2="8" y2="0" stroke="#999" stroke-width="2"/><line x1="0" y1="-8" x2="0" y2="8" stroke="#999" stroke-width="2"/></g></g>`;
+    let sleepers = ""; for (let x = 0; x < 200; x += 14) sleepers += `<rect x="${x}" y="166" width="8" height="5" fill="#8b6a4a"/>`;
+    return svg("#d6efff", `<path d="M0 130 Q50 100 100 128 T200 120 V200 H0Z" fill="#fff"/>${sleepers}
+      <line x1="0" y1="166" x2="200" y2="166" stroke="#6b4f3a" stroke-width="3"/>
+      <g class="a-train">
+        <rect x="-74" y="126" width="56" height="30" rx="4" fill="#3a86ff"/>
+        <rect x="-66" y="112" width="16" height="14" fill="#e63946"/><rect x="-46" y="116" width="18" height="10" fill="#ffd34d"/>
+        <line x1="-18" y1="146" x2="0" y2="146" stroke="#333" stroke-width="3"/>
+        <rect x="0" y="122" width="44" height="34" rx="4" fill="#e63946"/>
+        <rect x="36" y="100" width="28" height="56" rx="4" fill="#c1121f"/><rect x="42" y="108" width="16" height="14" rx="2" fill="#bfe3ff"/>
+        <rect x="10" y="102" width="12" height="20" fill="#333"/><rect x="7" y="98" width="18" height="6" fill="#333"/>
+        <circle cx="16" cy="92" r="6" fill="#fff" class="a-smoke"/><circle cx="16" cy="92" r="6" fill="#fff" class="a-smoke" style="animation-delay:1.5s"/>
+        ${wheel(-60,158)}${wheel(-32,158)}${wheel(12,158)}${wheel(50,158)}
+      </g>`);
+  }
+  case 22: {
+    let arms = "";
+    for (let k = 0; k < 6; k++) arms += `<g transform="rotate(${k*60})"><line x1="0" y1="0" x2="0" y2="-70" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M-15 -55 L0 -40 L15 -55 M-10 -70 L0 -60 L10 -70" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></g>`;
+    return svg("#3a6fd8", `${skyStars(22, 18, 200, "#cfe6ff")}
+      <g transform="translate(100 100)"><g class="a-spin">${arms}<circle r="10" fill="#fff"/><circle r="5" fill="#8fd3ff"/></g></g>`);
+  }
+  case 23: {
+    const cols = ["#ffd34d","#ff6fa8","#2bb565","#00b4d8","#fb5607"]; let bulbs = "";
+    const wires = [[0,50,100,100,200,50],[0,120,100,170,200,120]];
+    wires.forEach((w,wi)=>{ for (let i = 1; i < 8; i++){ const t = i/8, x = (1-t)*(1-t)*w[0]+2*(1-t)*t*w[2]+t*t*w[4], y = (1-t)*(1-t)*w[1]+2*(1-t)*t*w[3]+t*t*w[5];
+      bulbs += `<rect x="${(x-3).toFixed(1)}" y="${(y-2).toFixed(1)}" width="6" height="6" fill="#444"/><ellipse cx="${x.toFixed(1)}" cy="${(y+11).toFixed(1)}" rx="6" ry="9" fill="${cols[(i+wi)%5]}" class="a-blink" style="animation-delay:${((i+wi)%3*.33).toFixed(2)}s"/>`; } });
+    return svg("#102a5c", `${skyStars(23, 14, 200)}
+      <path d="M0 50 Q100 100 200 50 M0 120 Q100 170 200 120" stroke="#1d8f4e" stroke-width="3" fill="none"/>${bulbs}`);
+  }
+  case 24: {
+    const deer = x => `<g transform="translate(${x} 0)"><ellipse cx="0" cy="0" rx="13" ry="7" fill="#a0673a"/><circle cx="14" cy="-8" r="5" fill="#a0673a"/>
+      <path d="M13 -12 l-2 -8 M15 -12 l3 -8" stroke="#6b3e1f" stroke-width="2" stroke-linecap="round"/>
+      <path d="M-8 5 l-5 8 M-3 5 l-2 9 M5 5 l2 9 M9 5 l6 7" stroke="#6b3e1f" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="19" cy="-7" r="2.2" fill="#e63946"/></g>`;
+    return svg("#0f1f4d", `${skyStars(24, 30, 200)}<circle cx="120" cy="88" r="56" fill="#fff3b0"/>
+      <g transform="translate(0 110)"><g class="a-fly">
+        <path d="M-40 -4 L32 -8 M-40 -4 L62 -8" stroke="#c9a227" stroke-width="1.2"/>
+        <path d="M-60 -14 L-30 -14 Q-26 -14 -26 -8 L-28 4 L-60 4 Q-66 -6 -60 -14Z" fill="#e63946"/>
+        <path d="M-64 8 L-24 8 Q-18 8 -18 2" stroke="#c9a227" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <rect x="-56" y="-24" width="12" height="12" fill="#2bb565"/><rect x="-52" y="-24" width="3" height="12" fill="#ffd34d"/>
+        <circle cx="-38" cy="-22" r="6" fill="#ffd6b0"/><path d="M-44 -24 Q-38 -36 -32 -24Z" fill="#e63946"/><path d="M-44 -20 q6 10 12 0" fill="#fff"/><rect x="-44" y="-16" width="12" height="6" fill="#e63946"/>
+        ${deer(32)}${deer(62)}
+      </g></g>`);
+  }
+  case 25: return svg("#bfe6ff", `
+    <ellipse cx="40" cy="168" rx="90" ry="40" fill="#e9f6ff"/><ellipse cx="170" cy="164" rx="80" ry="36" fill="#e9f6ff"/>
+    <polygon points="22,150 34,112 46,150" fill="#1d8f4e"/><polygon points="160,140 172,98 184,140" fill="#2bb565"/><polygon points="120,150 128,124 136,150" fill="#1d8f4e"/>
+    ${star(30,36,6,"#fff","a-twinkle",.2)}${star(170,30,5,"#fff","a-twinkle",.8)}
+    <rect x="0" y="165" width="200" height="35" fill="#fff"/>
+    <g class="a-chase">
+      <g transform="translate(4 54)"><rect x="0" y="0" width="58" height="19" rx="9.5" fill="#fff" stroke="#1b2a4a" stroke-width="1.5"/><path d="M14 18 l-2 8 l9 -8" fill="#fff" stroke="#1b2a4a" stroke-width="1.5" stroke-linejoin="round"/><rect x="12" y="15" width="12" height="4" fill="#fff"/><text x="29" y="13.5" text-anchor="middle" font-family="Nunito, Trebuchet MS, sans-serif" font-weight="800" font-size="10" fill="#1b2a4a">Fermati!</text></g>
+      ${elf({x:14,y:148,s:.8,lean:10,tunic:"#e63946",tunic2:"#b51f30",collar:"#ffd34d",hat:"#2bb565",sock1:"#2bb565",sock2:"#1d8f4e",scared:false})}
+      <path d="M40 128 h-10 M44 138 h-14 M40 148 h-10" stroke="#8fb8d8" stroke-width="2.5" stroke-linecap="round" class="a-twinkle"/>
+      <circle cx="56" cy="162" r="4" fill="#fff" class="a-smoke"/><circle cx="52" cy="160" r="3" fill="#fff" class="a-smoke" style="animation-delay:.5s"/>
+      <g transform="translate(78 143)"><g class="a-tb">${tire()}</g></g>
+      ${elf({x:144,y:148,s:.8,lean:6,tunic:"#2bb565",tunic2:"#1d8f4e",collar:"#e63946",hat:"#e63946",sock1:"#e63946",sock2:"#c1121f",scared:true})}
+      <text x="162" y="96" font-family="Lilita One, Trebuchet MS, sans-serif" font-size="18" fill="#e63946" class="a-twinkle">!!</text>
+    </g>`);
+  }
+}
+
+/* ---------- Ante delle scatole ---------- */
+function doorBg(c, d){
+  const shade = "linear-gradient(160deg,rgba(255,255,255,.2),rgba(0,0,0,.14))";
+  switch(d % 5){
+    case 0: return `radial-gradient(circle,rgba(255,255,255,.3) 22%,transparent 24%) 0 0/16px 16px,${shade},${c}`;
+    case 1: return `repeating-linear-gradient(45deg,rgba(255,255,255,.2) 0 7px,transparent 7px 16px),${shade},${c}`;
+    case 2: return `repeating-conic-gradient(rgba(255,255,255,.16) 0 25%,transparent 0 50%) 0 0/20px 20px,${shade},${c}`;
+    case 3: return `repeating-linear-gradient(0deg,rgba(255,255,255,.22) 0 4px,transparent 4px 14px),${shade},${c}`;
+    default: return `radial-gradient(circle at 25% 25%,rgba(255,255,255,.4) 2px,transparent 3px) 0 0/12px 12px,radial-gradient(circle at 75% 75%,rgba(255,255,255,.22) 3px,transparent 4px) 0 0/12px 12px,${shade},${c}`;
+  }
+}
+
+function buildBox(d){
+  const el = document.createElement("div");
+  el.className = "box"; el.tabIndex = 0; el.setAttribute("role","button");
+  const bg = doorBg(COLORS[d-1], d);
+  el.innerHTML = `<div class="inside"></div>
+    <div class="door l" style="background:${bg}"><span class="dnum">${d}</span><span class="tape"></span></div>
+    <div class="door r" style="background:${bg}"><span class="lock" aria-hidden="true">🔒</span><span class="dic">dic</span><span class="tape"></span></div>
+    <div class="cutzone"><div class="cutline">${"<i></i>".repeat(BINS)}</div><span class="hint" aria-hidden="true">✂️</span><span class="scissors" aria-hidden="true">✂️</span></div>`;
+  const st = { d, el, bins:new Set(), cutting:false, last:null,
+    cz: el.querySelector(".cutzone"), segs:[...el.querySelectorAll(".cutline i")], sc: el.querySelector(".scissors") };
+
+  const canCut = () => !opened.has(d) && openable(d);
+  function mark(e){
+    const r = st.cz.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    st.sc.style.left = x + "px"; st.sc.style.top = y + "px";
+    if (x < -r.width * .7 || x > r.width * 1.7){ st.last = null; return; }
+    let b = Math.floor(y / r.height * BINS); b = Math.max(0, Math.min(BINS - 1, b));
+    const from = st.last === null ? b : st.last;
+    for (let i = Math.min(from,b); i <= Math.max(from,b); i++){
+      if (!st.bins.has(i)){ st.bins.add(i); st.segs[i].classList.add("on"); }
+    }
+    st.last = b;
+    if (st.bins.size >= BINS - 3) finishCut(st);
+  }
+  st.cz.addEventListener("pointerdown", e => {
+    if (!canCut()) return;
+    st.cutting = true; st.last = null;
+    try { st.cz.setPointerCapture(e.pointerId); } catch(_){}
+    el.classList.add("cutting"); mark(e); e.preventDefault();
+  });
+  st.cz.addEventListener("pointermove", e => { if (st.cutting) mark(e); });
+  ["pointerup","pointercancel","lostpointercapture"].forEach(t => st.cz.addEventListener(t, () => {
+    st.cutting = false; st.last = null; el.classList.remove("cutting");
+  }));
+
+  el.addEventListener("click", () => {
+    if (Date.now() - justCutAt < 1500) return;
+    if (opened.has(d) && openable(d)) return openModal(d, el);
+    if (!openable(d)) return lockedFeedback(st);
+    if (st.bins.size === 0) toast("Trascina le forbici lungo lo scotch, dall’alto in basso ✂️");
+  });
+  el.addEventListener("keydown", e => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    if (opened.has(d) && openable(d)) return openModal(d, el);
+    if (!openable(d)) return lockedFeedback(st);
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i >= BINS){ clearInterval(iv); finishCut(st); return; }
+      st.bins.add(i); st.segs[i].classList.add("on"); i++;
+    }, 30);
+  });
+  return st;
+}
+
+function finishCut(st){
+  if (opened.has(st.d)) return;
+  st.cutting = false; st.el.classList.remove("cutting");
+  st.segs.forEach(s => s.classList.add("on"));
+  opened.add(st.d); saveOpened();
+  justCutAt = Date.now();
+  st.el.classList.add("cut");
+  setTimeout(() => refreshStates(), 280);
+  setTimeout(() => openModal(st.d, st.el), 1300);
+}
+
+function lockedFeedback(st){
+  st.el.classList.remove("shake"); void st.el.offsetWidth; st.el.classList.add("shake");
+  toast(`🔒 La scatola ${st.d} si apre il ${st.d} dicembre alle 07:00. Ancora un po’ di pazienza!`);
+}
+
+function refreshStates(instant){
+  boxes.forEach(st => {
+    const { d, el } = st;
+    const can = openable(d), isOpen = can && opened.has(d);
+    el.setAttribute("aria-label", isOpen ? `Scatola ${d}, aperta: leggi l’indizio` : can ? `Scatola ${d}, pronta da aprire` : `Scatola ${d}, si apre il ${d} dicembre alle 7`);
+    if (isOpen && !el.classList.contains("open")){
+      el.querySelector(".inside").innerHTML = scene(d) + `<span class="badge">${d}</span>`;
+      if (instant) el.classList.add("instant");
+      el.classList.add("cut","open");
+      if (instant) requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("instant")));
+    }
+    if (!isOpen && el.classList.contains("open")){
+      el.classList.remove("open","cut");
+      el.querySelector(".inside").innerHTML = "";
+    }
+    if (!isOpen){
+      st.bins.clear(); st.segs.forEach(s => s.classList.remove("on"));
+    }
+    el.classList.toggle("ready", can && !isOpen);
+    el.classList.toggle("locked", !can);
+  });
+}
+
+/* ---------- Countdown ---------- */
+const cdLabel = document.getElementById("cdLabel"), cdUnits = document.getElementById("cdUnits");
+function tick(){
+  const now = Date.now();
+  let next = null;
+  for (let d = 1; d <= 25; d++){ if (unlockAt(d).getTime() > now){ next = d; break; } }
+  if (next !== lastNext){ lastNext = next; refreshStates(); }
+  if (next === null){
+    cdLabel.textContent = "Tutte le scatole sono aperte. Buon Natale! 🎄";
+    cdUnits.hidden = true; return;
+  }
+  cdUnits.hidden = false;
+  cdLabel.textContent = next === 1
+    ? "Manca questo tempo all’apertura della prima scatola"
+    : `Manca questo tempo alla scatola ${next} (${next} dicembre, ore 07:00)`;
+  let s = Math.floor((unlockAt(next).getTime() - now) / 1000);
+  const dd = Math.floor(s / 86400); s -= dd * 86400;
+  const hh = Math.floor(s / 3600); s -= hh * 3600;
+  const mm = Math.floor(s / 60); s -= mm * 60;
+  document.getElementById("cdD").textContent = pad(dd);
+  document.getElementById("cdH").textContent = pad(hh);
+  document.getElementById("cdM").textContent = pad(mm);
+  document.getElementById("cdS").textContent = pad(s);
+}
+
+/* ---------- Finestra indizio ---------- */
+const modal = document.getElementById("modal");
+let returnFocus = null;
+function openModal(d, from){
+  const info = CONFIG.scatole[d-1];
+  document.getElementById("mScene").innerHTML = scene(d);
+  document.getElementById("mKicker").textContent = `Scatola ${d} · ${d} dicembre`;
+  document.getElementById("mTitle").textContent = info.titolo;
+  document.getElementById("mText").textContent = info.indizio;
+  returnFocus = from || null;
+  modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  modal.querySelector(".close").focus();
+}
+function closeModal(){
+  modal.hidden = true;
+  document.getElementById("mScene").innerHTML = "";
+  document.body.style.overflow = "";
+  if (returnFocus) returnFocus.focus();
+}
+modal.addEventListener("click", e => { if (e.target.closest("[data-close]")) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+/* ---------- Modalità amministratore ---------- */
+const adminBtn = document.getElementById("adminBtn");
+const login = document.getElementById("login");
+const pwd = document.getElementById("pwd");
+const loginErr = document.getElementById("loginErr");
+async function sha256(text){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function setAdmin(on){
+  preview = on;
+  try { on ? sessionStorage.setItem("calendario-admin", "1") : sessionStorage.removeItem("calendario-admin"); } catch(e){}
+  applyMode();
+}
+function openLogin(){
+  pwd.value = ""; loginErr.textContent = "";
+  login.hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(() => pwd.focus(), 50);
+}
+function closeLogin(){
+  login.hidden = true; document.body.style.overflow = ""; adminBtn.focus();
+}
+adminBtn.addEventListener("click", () => {
+  if (preview){ setAdmin(false); toast("Sei uscito dalla modalità amministratore."); }
+  else openLogin();
+});
+login.addEventListener("click", e => { if (e.target.closest("[data-close-login]")) closeLogin(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !login.hidden) closeLogin(); });
+document.getElementById("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  let ok = false;
+  try { ok = (await sha256(pwd.value.trim())) === ADMIN_HASH; } catch(err){ ok = false; }
+  if (ok){
+    closeLogin(); setAdmin(true);
+    toast("Modalità amministratore attiva: tutte le scatole sono sbloccate.");
+  } else {
+    loginErr.textContent = "Password errata. Riprova.";
+    const card = e.currentTarget; card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    pwd.select();
+  }
+});
+
+function applyMode(){
+  document.getElementById("preview").hidden = !preview;
+  adminBtn.textContent = preview ? "Esci da amministratore" : "Amministratore";
+  adminBtn.classList.toggle("on", preview);
+  opened = loadOpened();
+  lastNext = undefined;
+  refreshStates(true);
+  tick();
+}
+document.getElementById("resetBtn").addEventListener("click", () => {
+  opened = new Set(); saveOpened(); refreshStates(); toast("Scatole richiuse. Puoi provarle di nuovo.");
+});
+
+/* ---------- Neve ---------- */
+(function snow(){
+  const cv = document.getElementById("snow"), ctx = cv.getContext("2d");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let W = 0, H = 0, flakes = [];
+  const make = init => {
+    const r = Math.random() * 2.6 + .8;
+    return { x: Math.random() * W, y: init ? Math.random() * H : -10, r, vy: (r * .35 + .3) * (reduce ? .35 : 1),
+             sway: Math.random() * 1.5 + .3, ph: Math.random() * 6.28, o: Math.random() * .5 + .45 };
+  };
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.max(30, Math.min(220, Math.round(W * H / (reduce ? 40000 : 9000))));
+    while (flakes.length < n) flakes.push(make(true));
+    flakes.length = n;
+  }
+  let t0 = performance.now();
+  function frame(t){
+    const dt = Math.min(50, t - t0) / 16.67; t0 = t;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#fff";
+    for (const f of flakes){
+      f.y += f.vy * dt; f.ph += .02 * dt; f.x += Math.sin(f.ph) * f.sway * .4 * dt;
+      if (f.y > H + 10) Object.assign(f, make(false));
+      if (f.x > W + 10) f.x = -10; else if (f.x < -10) f.x = W + 10;
+      ctx.globalAlpha = f.o; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  addEventListener("resize", resize);
+  resize(); requestAnimationFrame(frame);
+})();
+
+/* ---------- Avvio ---------- */
+const grid = document.getElementById("grid");
+for (let d = 1; d <= 25; d++){ const st = buildBox(d); boxes.push(st); grid.appendChild(st.el); }
+applyMode();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

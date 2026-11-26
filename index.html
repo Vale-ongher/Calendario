@@ -100,48 +100,101 @@ h1{
 .box.open .door.r{transform:rotateY(108deg)}
 .box.instant .door{transition:none}
 
+.box{container-type:inline-size}
 .dnum{
-  position:absolute;top:8%;left:12%;
-  font-family:"Lilita One","Trebuchet MS",sans-serif;font-size:clamp(1.5rem,4.6vw,2.5rem);line-height:1;color:#fff;
-  text-shadow:0 2px 0 rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.25);
+  position:absolute;top:7%;left:10%;z-index:6;pointer-events:none;
+  font-family:"Lilita One","Trebuchet MS",sans-serif;font-size:30px;font-size:21cqw;line-height:1;color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,.3),0 3px 8px rgba(0,0,0,.3);
 }
-.dic{position:absolute;bottom:9%;right:12%;font-weight:800;font-size:clamp(.62rem,1.7vw,.85rem);color:#fff;opacity:.9;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-.lock{position:absolute;top:9%;right:11%;font-size:clamp(.8rem,2.2vw,1.1rem);filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-.box.ready .lock,.box.open .lock{display:none}
-.box.locked .door{filter:saturate(.7) brightness(.9)}
+.dic{position:absolute;bottom:7%;right:10%;z-index:6;pointer-events:none;font-weight:800;font-size:11px;font-size:8cqw;color:#fff;opacity:.95;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.lock{position:absolute;top:8%;right:9%;z-index:6;pointer-events:none;font-size:14px;font-size:10cqw;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.box.ready .lock,.box.open .lock,.zbox .lock{display:none}
+.box.open .dnum,.box.open .dic,.box.open .cover{display:none}
+.box.locked .door,.box.locked .cover{filter:saturate(.7) brightness(.9)}
+.cover{position:absolute;inset:0;z-index:4;pointer-events:none}
 
-/* Scotch: metà sinistra sull’anta sinistra, metà destra sull’anta destra */
-.tape{
-  position:absolute;top:-3px;bottom:-3px;width:30%;
+/* Scotch a croce */
+.tape{position:absolute}
+.tape-h{left:-3px;right:-3px;top:40%;height:20%}
+.tape-v{top:-3px;bottom:-3px;left:40%;width:20%}
+.tape .half{
+  position:absolute;display:block;
   background:
-    linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,0) 45%,rgba(255,255,255,.18)),
-    repeating-linear-gradient(0deg,rgba(150,110,50,.10) 0 2px,transparent 2px 7px),
-    rgba(226,200,142,.86);
-  box-shadow:0 1px 3px rgba(0,0,0,.25);
-  transition:transform .3s ease;
+    linear-gradient(90deg,rgba(255,255,255,.3),rgba(255,255,255,0) 45%,rgba(255,255,255,.15)),
+    repeating-linear-gradient(45deg,rgba(150,110,50,.10) 0 2px,transparent 2px 7px),
+    rgba(226,200,142,.88);
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+  transition:transform .6s ease,opacity .6s ease;
 }
-.door.l .tape{right:0;clip-path:polygon(0 3px,25% 0,50% 3px,75% 0,100% 2px,100% calc(100% - 2px),75% 100%,50% calc(100% - 3px),25% 100%,0 calc(100% - 3px))}
-.door.r .tape{left:0;clip-path:polygon(0 2px,25% 0,50% 3px,75% 0,100% 3px,100% calc(100% - 3px),75% 100%,50% calc(100% - 3px),25% 100%,0 calc(100% - 2px))}
-.box.cut .door.l .tape{transform:translateX(-2px)}
-.box.cut .door.r .tape{transform:translateX(2px)}
+.tape-h .half{left:0;right:0;height:50%}.tape-h .half.a{top:0}.tape-h .half.b{bottom:0}
+.tape-v .half{top:0;bottom:0;width:50%}.tape-v .half.a{left:0}.tape-v .half.b{right:0}
+.tape.cut .half{opacity:0}
+.tape-h.cut .half.a{transform:translateY(-70%) rotate(-3deg)}.tape-h.cut .half.b{transform:translateY(70%) rotate(2deg)}
+.tape-v.cut .half.a{transform:translateX(-70%) rotate(-3deg)}.tape-v.cut .half.b{transform:translateX(70%) rotate(3deg)}
+.cutrow{position:absolute;left:0;right:0;top:50%;height:3px;transform:translateY(-50%);display:flex}
+.cutcol{position:absolute;top:0;bottom:0;left:50%;width:3px;transform:translateX(-50%);display:flex;flex-direction:column}
+.cutrow i,.cutcol i{flex:1;display:block}
+.cutrow i.on{background:repeating-linear-gradient(90deg,rgba(60,30,0,.85) 0 4px,transparent 4px 7px)}
+.cutcol i.on{background:repeating-linear-gradient(180deg,rgba(60,30,0,.85) 0 4px,transparent 4px 7px)}
+.tape.cut .cutrow,.tape.cut .cutcol{opacity:0;transition:opacity .3s}
 
-.cutzone{position:absolute;top:0;bottom:0;left:30%;width:40%;z-index:3}
-.box.ready .cutzone{cursor:crosshair;touch-action:none}
-.box.open .cutzone{display:none}
-.cutline{position:absolute;top:0;bottom:0;left:50%;width:3px;transform:translateX(-50%);display:flex;flex-direction:column}
-.cutline i{flex:1;display:block}
-.cutline i.on{background:repeating-linear-gradient(180deg,rgba(60,30,0,.8) 0 3px,transparent 3px 5px)}
-.hint{display:none;position:absolute;top:-14px;left:50%;font-size:clamp(1.1rem,3vw,1.5rem);pointer-events:none;animation:hint 1.1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+/* Sigillo di ceralacca */
+.seal{position:absolute;left:50%;top:50%;width:46%;transform:translate(-50%,-50%);filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+.seal svg{display:block;width:100%;height:auto}
+.seal .crack{opacity:0;transition:opacity .15s}
+.seal.lv1 .c1,.seal.lv2 .c1,.seal.lv2 .c2{opacity:1}
+.seal.broken{animation:sealpop .45s ease-in forwards}
+@keyframes sealpop{to{transform:translate(-50%,-50%) scale(1.6) rotate(25deg);opacity:0}}
+.zbox.squash{animation:squash .35s ease}
+@keyframes squash{0%{transform:scale(1)}30%{transform:scale(1.07,.92)}60%{transform:scale(.96,1.05)}100%{transform:scale(1)}}
+.spark{position:absolute;z-index:8;pointer-events:none;color:#ffd34d;font-size:20px;text-shadow:0 0 6px rgba(255,211,77,.8);animation:spark .6s ease-out forwards}
+@keyframes spark{from{transform:translate(-50%,-50%) scale(.6);opacity:1}to{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(1.2);opacity:0}}
+
+/* Carta regalo da scartare */
+.paper{position:absolute;inset:-1px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr)}
+.paper i{
+  display:block;
+  background:
+    linear-gradient(90deg,transparent 45%,var(--rib) 45% 55%,transparent 55%),
+    linear-gradient(0deg,transparent 45%,var(--rib) 45% 55%,transparent 55%),
+    radial-gradient(circle,rgba(255,255,255,.35) 20%,transparent 22%),
+    var(--paper);
+  background-size:500% 500%,500% 500%,14px 14px,auto;
+  background-position:var(--px) var(--py),var(--px) var(--py),0 0,0 0;
+}
+.paper i:nth-child(1){border-top-left-radius:14px}.paper i:nth-child(5){border-top-right-radius:14px}
+.paper i:nth-child(21){border-bottom-left-radius:14px}.paper i:nth-child(25){border-bottom-right-radius:14px}
+.paper.whole{display:block;border-radius:14px;overflow:hidden}
+.paper.whole i{width:100%;height:100%;background-size:100% 100%,100% 100%,12px 12px,auto;background-position:0 0}
+.paper i.torn{animation:tear .7s ease-in forwards;pointer-events:none}
+@keyframes tear{to{transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(.5);opacity:0}}
+.bow{position:absolute;left:50%;top:50%;width:42%;transform:translate(-50%,-58%);filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));transition:transform .55s ease-in,opacity .55s}
+.bow svg{display:block;width:100%;height:auto}
+.bow.gone{transform:translate(-50%,140%) rotate(40deg);opacity:0}
+
+/* Suggerimento sulle scatole pronte */
+.hint{display:none;position:absolute;z-index:7;top:-8%;left:50%;transform:translateX(-50%);font-size:20px;font-size:13cqw;pointer-events:none;animation:hint 1.1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 .box.ready .hint{display:block}
-.box.cutting .hint{display:none}
-.scissors{display:none;position:absolute;left:50%;top:0;font-size:1.8rem;pointer-events:none;transform:translate(-50%,-50%) rotate(90deg);filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))}
-.box.cutting .scissors{display:block}
-@keyframes hint{0%,100%{transform:translateX(-50%) rotate(90deg) translateX(0)}50%{transform:translateX(-50%) rotate(90deg) translateX(8px)}}
+@keyframes hint{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-6px)}}
 
 .box.ready{animation:ready 2s ease-in-out infinite}
-@keyframes ready{0%,100%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 0 rgba(255,211,77,.0)}50%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 6px rgba(255,211,77,.55)}}
+@keyframes ready{0%,100%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 0 rgba(255,211,77,0)}50%{box-shadow:0 10px 18px rgba(2,22,70,.35),0 0 0 6px rgba(255,211,77,.55)}}
 .box.shake{animation:shake .45s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-2deg)}40%{transform:translateX(6px) rotate(2deg)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* Scatola ingrandita */
+.zoom{position:fixed;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;padding:calc(60px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.zoom[hidden]{display:none}
+.zstage{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;pointer-events:none}
+.zstage > *{pointer-events:auto}
+.zbox{width:min(80vw,56vh,440px);border-radius:20px;perspective:1300px;touch-action:none;cursor:pointer;box-shadow:0 22px 50px rgba(0,10,40,.55)}
+.zbox:focus-visible{box-shadow:0 0 0 4px var(--gold),0 22px 50px rgba(0,10,40,.55)}
+.zbox.t-taglia,.zbox.t-scarta{cursor:crosshair}
+.zinstr{margin:0;text-align:center;font-weight:800;font-size:1.08rem;line-height:1.4;color:#fff;max-width:34ch;text-shadow:0 2px 6px rgba(0,0,0,.45)}
+.zprog{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:34px}
+.zprog span{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.16);border:1.5px solid var(--glass-line);color:#fff;font-weight:700;font-size:.9rem}
+.zprog span.done{background:var(--gold);color:#1b2a4a;border-color:var(--gold)}
+.zclose{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px}
 
 /* ---------- Toast, banner, footer ---------- */
 #toast{
@@ -254,6 +307,84 @@ footer{text-align:center;margin-top:30px;font-size:.88rem;opacity:.8;line-height
 @keyframes lid{0%,55%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(0,-18px) rotate(-7deg)}}
 @keyframes tb{from{transform:translateY(0)}to{transform:translateY(-5px)}}
 
+/* Stato di partenza delle scene 1-3: se le animazioni non partono si vede comunque la scena, mai un riquadro nero */
+.s1-fade,.s3-fade,.s1-b,.s1-angry,.s1-zB,.s1-light,.s1-beam,.s2-out,.s2-up,.s2-q,.s3-hand,.s3-wow{opacity:0}
+.s3-tv{opacity:.2}
+
+/* Scena 1: lo gnomo dormiglione (8 s) */
+.s1-light{animation:s1light 8s linear infinite}
+.s1-beam{animation:s1beam 8s linear infinite}
+.s1-a{animation:s1a 8s linear infinite}
+.s1-b{animation:s1b 8s linear infinite}
+.s1-angry{animation:s1angry 8s linear infinite}
+.s1-zA{animation:s1zA 8s linear infinite}
+.s1-zB{animation:s1zB 8s linear infinite}
+.s1-fade{animation:s1fade 8s linear infinite;pointer-events:none}
+.s1-shake{transform-origin:0 0;animation:s1shake 8s linear infinite}
+.s1-z{animation:zfloat 2.4s ease-out infinite}
+.s1-breath{transform-box:fill-box;transform-origin:50% 100%;animation:breath 2.6s ease-in-out infinite alternate}
+@keyframes s1light{0%,42%{opacity:0}48%,90%{opacity:1}96%,100%{opacity:0}}
+@keyframes s1beam{0%,42%{opacity:0}48%,90%{opacity:.6}96%,100%{opacity:0}}
+@keyframes s1a{0%,61%{opacity:1}62%,100%{opacity:0}}
+@keyframes s1b{0%,61%{opacity:0}62%,100%{opacity:1}}
+@keyframes s1angry{0%,49%{opacity:0}51%,66%{opacity:1}68%,100%{opacity:0}}
+@keyframes s1zA{0%,40%{opacity:1}44%,100%{opacity:0}}
+@keyframes s1zB{0%,72%{opacity:0}76%,92%{opacity:1}95%,100%{opacity:0}}
+@keyframes s1fade{0%{opacity:1}5%,93%{opacity:0}100%{opacity:1}}
+@keyframes s1shake{0%,50%,61%,100%{transform:translate(0,0) rotate(0)}52%{transform:translate(-1.5px,-1px) rotate(-5deg)}54%{transform:translate(1.5px,0) rotate(5deg)}56%{transform:translate(-1.5px,1px) rotate(-5deg)}58%{transform:translate(1.5px,0) rotate(4deg)}}
+@keyframes zfloat{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(12px,-28px);opacity:0}}
+@keyframes breath{from{transform:scaleY(1)}to{transform:scaleY(1.04)}}
+
+/* Scena 2: l’elfo dopo la doccia (8 s) */
+.s2-on{animation:s2on 8s linear infinite}
+.s2-in{animation:s2in 8s linear infinite}
+.s2-out{animation:s2out 8s linear infinite}
+.s2-walk{animation:s2walk 8s ease-in-out infinite}
+.s2-bob{animation:s2bob 8s linear infinite}
+.s2-down{animation:s2down 8s linear infinite}
+.s2-up{animation:s2up 8s linear infinite}
+.s2-q{animation:s2q 8s linear infinite}
+.s2-look{animation:s2look 1.4s ease-in-out infinite alternate}
+.s2-water{stroke-dasharray:6 9;animation:s2water .35s linear infinite}
+@keyframes s2on{0%,42%{opacity:1}45%,100%{opacity:0}}
+@keyframes s2in{0%,45%{opacity:1}46%,100%{opacity:0}}
+@keyframes s2out{0%,45%{opacity:0}46%,100%{opacity:1}}
+@keyframes s2walk{0%,46%{transform:translateX(0)}60%,100%{transform:translateX(70px)}}
+@keyframes s2bob{0%,46%,60%,100%{transform:translateY(0)}49.5%,56.5%{transform:translateY(-4px)}53%{transform:translateY(0)}}
+@keyframes s2down{0%,59%{opacity:1}60%,100%{opacity:0}}
+@keyframes s2up{0%,59%{opacity:0}60%,100%{opacity:1}}
+@keyframes s2q{0%,62%{opacity:0}66%,91%{opacity:1}94%,100%{opacity:0}}
+@keyframes s2look{from{transform:translateX(-1.6px)}to{transform:translateX(1.6px)}}
+@keyframes s2water{to{stroke-dashoffset:-15}}
+
+/* Scena 3: la pista di popcorn (10 s) */
+.s3-walk{animation:s3walk 10s linear infinite}
+.s3-bend{transform-origin:0 0;animation:s3bend 10s ease-in-out infinite}
+.s3-legA{transform-origin:0 0;animation:s3legA 10s linear infinite}
+.s3-legB{transform-origin:0 0;animation:s3legB 10s linear infinite}
+.s3-p1{animation:s3p1 10s linear infinite}
+.s3-p2{animation:s3p2 10s linear infinite}
+.s3-p3{animation:s3p3 10s linear infinite}
+.s3-hand{animation:s3hand 10s linear infinite}
+.s3-wow{animation:s3wow 10s linear infinite}
+.s3-fade{animation:s3fade 10s linear infinite;pointer-events:none}
+.s3-eat{transform-origin:0 0;animation:s3eat 1.8s ease-in-out infinite}
+.s3-munch{transform-box:fill-box;transform-origin:50% 0;animation:munch .22s ease-in-out infinite alternate}
+.s3-tv{animation:s3tv 1.3s steps(1) infinite}
+@keyframes s3walk{0%{transform:translateX(0)}10%,20%{transform:translateX(22px)}30%,40%{transform:translateX(52px)}50%,60%{transform:translateX(82px)}68%,100%{transform:translateX(86px)}}
+@keyframes s3bend{0%,11%{transform:rotate(0)}14%,17%{transform:rotate(24deg)}20%,31%{transform:rotate(0)}34%,37%{transform:rotate(24deg)}40%,51%{transform:rotate(0)}54%,57%{transform:rotate(24deg)}60%,100%{transform:rotate(0)}}
+@keyframes s3legA{0%,10%,20%,30%,40%,50%,60%,68%,100%{transform:rotate(0)}2.5%,7.5%,22.5%,27.5%,42.5%,47.5%,62%,66%{transform:rotate(28deg)}5%,25%,45%,64%{transform:rotate(-28deg)}}
+@keyframes s3legB{0%,10%,20%,30%,40%,50%,60%,68%,100%{transform:rotate(0)}2.5%,7.5%,22.5%,27.5%,42.5%,47.5%,62%,66%{transform:rotate(-28deg)}5%,25%,45%,64%{transform:rotate(28deg)}}
+@keyframes s3p1{0%,15%{opacity:1}16%,100%{opacity:0}}
+@keyframes s3p2{0%,35%{opacity:1}36%,100%{opacity:0}}
+@keyframes s3p3{0%,55%{opacity:1}56%,100%{opacity:0}}
+@keyframes s3hand{0%,15%{opacity:0}16%,100%{opacity:1}}
+@keyframes s3wow{0%,68%{opacity:0}70%,93%{opacity:1}95%,100%{opacity:0}}
+@keyframes s3fade{0%{opacity:1}4%,95%{opacity:0}100%{opacity:1}}
+@keyframes s3eat{0%,35%{transform:rotate(0)}55%,72%{transform:rotate(150deg)}92%,100%{transform:rotate(0)}}
+@keyframes munch{from{transform:scaleY(1)}to{transform:scaleY(.8)}}
+@keyframes s3tv{0%{opacity:.18}25%{opacity:.32}50%{opacity:.12}75%{opacity:.26}}
+
 @media (prefers-reduced-motion: reduce){
   .box.ready{animation:none;box-shadow:0 0 0 4px rgba(255,211,77,.7),0 10px 18px rgba(2,22,70,.35)}
   .hint{animation:none}
@@ -277,7 +408,7 @@ footer{text-align:center;margin-top:30px;font-size:.88rem;opacity:.8;line-height
         <div class="unit"><b id="cdS">00</b><span>secondi</span></div>
       </div>
     </div>
-    <p class="howto">Quando una scatola si illumina, trascina le forbici lungo lo scotch per tagliarlo.</p>
+    <p class="howto">Quando una scatola si illumina, toccala: ti dirà come aprirla.</p>
   </header>
 
   <div class="preview" id="preview" hidden>Modalità amministratore: tutte le scatole sono sbloccate per l’anteprima.<button type="button" id="resetBtn">Richiudi tutte</button></div>
@@ -297,6 +428,16 @@ footer{text-align:center;margin-top:30px;font-size:.88rem;opacity:.8;line-height
     <p class="m-kicker" id="mKicker"></p>
     <h2 id="mTitle"></h2>
     <p class="m-text" id="mText"></p>
+  </div>
+</div>
+
+<div class="zoom" id="zoom" hidden>
+  <div class="backdrop zbackdrop" data-zclose></div>
+  <button class="close zclose" type="button" data-zclose aria-label="Chiudi">×</button>
+  <div class="zstage">
+    <div id="zwrap"></div>
+    <p class="zinstr" id="zinstr" aria-live="polite"></p>
+    <div class="zprog" id="zprog"></div>
   </div>
 </div>
 
@@ -320,10 +461,11 @@ footer{text-align:center;margin-top:30px;font-size:.88rem;opacity:.8;line-height
 const CONFIG = {
   oraApertura: 7,          // ogni scatola si apre alle 7:00
   anno: null,              // null = anno in corso
+  aperture: null,          // null = casuale; oppure 25 valori tra "taglia", "tocca", "scarta"
   scatole: [
-    { titolo: "Il pupazzo di neve",        indizio: "Primo indizio: scrivi qui il testo che vuoi svelare il 1° dicembre." },
-    { titolo: "Il pacco misterioso",        indizio: "Secondo indizio: scrivi qui il testo del 2 dicembre." },
-    { titolo: "La campana d’oro",           indizio: "Terzo indizio: scrivi qui il testo del 3 dicembre." },
+    { titolo: "Lo gnomo dormiglione",        indizio: "Primo indizio: scrivi qui il testo che vuoi svelare il 1° dicembre." },
+    { titolo: "L’elfo dopo la doccia",        indizio: "Secondo indizio: scrivi qui il testo del 2 dicembre." },
+    { titolo: "La pista di popcorn",           indizio: "Terzo indizio: scrivi qui il testo del 3 dicembre." },
     { titolo: "La stella cometa",           indizio: "Quarto indizio: scrivi qui il testo del 4 dicembre." },
     { titolo: "Il bastoncino di zucchero",  indizio: "Quinto indizio: scrivi qui il testo del 5 dicembre." },
     { titolo: "L’albero illuminato",        indizio: "Sesto indizio: scrivi qui il testo del 6 dicembre." },
@@ -391,6 +533,28 @@ function skyStars(seed, n, maxY = 120, color = "#fff"){
   const r = rand(seed); let s = "";
   for (let i = 0; i < n; i++) s += `<circle cx="${(r()*200).toFixed(0)}" cy="${(r()*maxY).toFixed(0)}" r="${(r()*1.6+.6).toFixed(1)}" fill="${color}" class="a-twinkle" style="animation-delay:${(r()*1.4).toFixed(2)}s"/>`;
   return s;
+}
+const OL = `stroke="#3a2340" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"`;
+const limb = (d, c, w = 5) => `<path d="${d}" stroke="#3a2340" stroke-width="${w + 2.8}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
+/* Gnomo nordico: cappello che copre gli occhi, nasone, barbone bianco */
+function tomte(o){
+  const c = o.c, c2 = o.c2, dx = o.dx || 0, b = o.beardEnd ?? -10;
+  let dots = "";
+  [[-12,-66],[-4,-74],[6,-70],[-8,-82],[2,-86],[12,-62],[-17,-60],[9,-78]].forEach(p => dots += `<circle cx="${p[0]}" cy="${p[1]}" r="1.2" fill="${c2}" opacity=".75"/>`);
+  return `${o.legs ?? `<ellipse cx="-10" cy="-4" rx="9" ry="5.5" fill="${c}" ${OL}/><ellipse cx="10" cy="-4" rx="9" ry="5.5" fill="${c}" ${OL}/><path d="M-17 -2 q7 3 14 0 M3 -2 q7 3 14 0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>`}
+    <path d="M-22 -6 C-26 -30 -20 -52 0 -54 C20 -52 26 -30 22 -6 Q0 0 -22 -6Z" fill="${c}" ${OL}/>
+    <path d="M-16 -14 l1 -4 M-12 -30 l1 -4 M15 -20 l-1 -4 M14 -36 l-1 -4" stroke="${c2}" stroke-width="1.4" stroke-linecap="round"/>
+    ${o.arms ?? `<ellipse cx="-23" cy="-26" rx="6" ry="10" transform="rotate(14 -23 -26)" fill="${c}" ${OL}/><ellipse cx="23" cy="-26" rx="6" ry="10" transform="rotate(-14 23 -26)" fill="${c}" ${OL}/>`}
+    <path d="M${dx-18} -56 C${dx-26} -44 ${dx-24} ${b-14} ${dx-16} ${b-2} Q${dx-12} ${b+4} ${dx-8} ${b} Q${dx-4} ${b+6} ${dx} ${b+1} Q${dx+4} ${b+6} ${dx+8} ${b} Q${dx+12} ${b+4} ${dx+16} ${b-2} C${dx+24} ${b-14} ${dx+26} -44 ${dx+18} -56 Z" fill="#fff" ${OL}/>
+    <path d="M${dx-9} -46 C${dx-11} -38 ${dx-10} ${b-10} ${dx-8} ${b-4} M${dx} -48 V${b-3} M${dx+9} -46 C${dx+11} -38 ${dx+10} ${b-10} ${dx+8} ${b-4} M${dx-15} -40 C${dx-16} -32 ${dx-15} ${b-14} ${dx-12} ${b-8} M${dx+15} -40 C${dx+16} -32 ${dx+15} ${b-14} ${dx+12} ${b-8}" stroke="#d3dde8" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path ${o.munch ? 'class="s3-munch"' : ""} d="M${dx-15} -52 C${dx-11} -43 ${dx-2} -45 ${dx} -49 C${dx+2} -45 ${dx+11} -43 ${dx+15} -52 C${dx+8} -57 ${dx-8} -57 ${dx-15} -52Z" fill="#fff" ${OL}/>
+    <g transform="${o.flip ? "scale(-1 1)" : "scale(1 1)"}">
+      <path d="M-24 -54 Q0 -63 24 -54 C22 -66 18 -78 16 -88 C18 -94 22 -97 26 -98 C18 -102 8 -98 2 -90 C-8 -78 -18 -66 -24 -54Z" fill="${c}" ${OL}/>
+      ${dots}
+      <path d="M-25 -52 Q0 -61 25 -52 L24 -58 Q0 -67 -24 -58Z" fill="${c2}" ${OL}/>
+    </g>
+    <circle cx="${dx}" cy="-53" r="8.5" fill="#f4b99a" ${OL}/><circle cx="${dx-2.8}" cy="-56" r="2.4" fill="#fff" opacity=".65"/>
+    ${o.extra || ""}`;
 }
 const ground = (y = 172, c = "#fff") => `<path d="M0 ${y} Q50 ${y-12} 100 ${y} T200 ${y} V200 H0Z" fill="${c}"/>`;
 const svg = (bg, body) => `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="200" height="200" fill="${bg}"/>${body}</svg>`;
@@ -470,34 +634,138 @@ function tire(){
 
 function scene(d){
   switch(d){
-  case 1: return svg("#cfe8ff", `${ground(170)}
-    <circle cx="100" cy="148" r="36" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
-    <circle cx="100" cy="100" r="27" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
-    <circle cx="100" cy="63" r="20" fill="#fff" stroke="#d3e4f5" stroke-width="3"/>
-    <line x1="75" y1="98" x2="48" y2="80" stroke="#6b3e1f" stroke-width="4" stroke-linecap="round"/>
-    <g transform="translate(125 98)"><g class="a-wave"><line x1="0" y1="0" x2="30" y2="-22" stroke="#6b3e1f" stroke-width="4" stroke-linecap="round"/><line x1="22" y1="-16" x2="31" y2="-8" stroke="#6b3e1f" stroke-width="3" stroke-linecap="round"/></g></g>
-    <circle cx="93" cy="59" r="2.8" fill="#222"/><circle cx="107" cy="59" r="2.8" fill="#222"/>
-    <path d="M100 65 L122 69 L100 71 Z" fill="#ff8c1a"/>
-    <path d="M92 74 q8 5 16 0" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <rect x="81" y="80" width="38" height="8" rx="4" fill="#e63946"/><rect x="104" y="83" width="8" height="22" rx="3" fill="#e63946"/>
-    <circle cx="100" cy="96" r="3" fill="#333"/><circle cx="100" cy="108" r="3" fill="#333"/><circle cx="100" cy="140" r="3" fill="#333"/>
-    <rect x="84" y="22" width="32" height="24" rx="2" fill="#222"/><rect x="76" y="44" width="48" height="6" rx="3" fill="#222"/><rect x="84" y="37" width="32" height="5" fill="#e63946"/>`);
-  case 2: return svg("#ffe3e8", `
-    ${star(40,50,9,"#ffbe0b","a-twinkle",0)}${star(160,40,7,"#ffbe0b","a-twinkle",.5)}${star(165,110,6,"#ff6fa8","a-twinkle",.9)}${star(35,120,6,"#ff6fa8","a-twinkle",.3)}
-    <ellipse cx="100" cy="174" rx="55" ry="7" fill="rgba(0,0,0,.08)"/>
-    <rect x="55" y="104" width="90" height="68" rx="4" fill="#e63946"/><rect x="93" y="104" width="14" height="68" fill="#ffd34d"/>
-    <g class="a-lid"><rect x="48" y="86" width="104" height="22" rx="4" fill="#c1121f"/><rect x="93" y="86" width="14" height="22" fill="#ffd34d"/>
-    <ellipse cx="85" cy="80" rx="15" ry="9" fill="none" stroke="#ffd34d" stroke-width="6"/><ellipse cx="115" cy="80" rx="15" ry="9" fill="none" stroke="#ffd34d" stroke-width="6"/><circle cx="100" cy="83" r="7" fill="#f4b400"/></g>`);
-  case 3: return svg("#fff1c9", `
-    <g transform="translate(100 40)"><g class="a-swing">
-      <line x1="0" y1="-45" x2="0" y2="16" stroke="#b3802a" stroke-width="3"/>
-      <circle cx="0" cy="100" r="9" fill="#9a6400"/>
-      <path d="M-38 92 Q-30 84 -28 60 Q-24 20 0 18 Q24 20 28 60 Q30 84 38 92 Z" fill="#f4b400" stroke="#c98f00" stroke-width="3"/>
-      <rect x="-42" y="88" width="84" height="9" rx="4.5" fill="#e0a100"/>
-      <path d="M-16 34 Q-22 56 -22 80" stroke="rgba(255,255,255,.55)" stroke-width="5" fill="none" stroke-linecap="round"/>
-      <ellipse cx="-10" cy="18" rx="12" ry="6" fill="#1d8f4e" transform="rotate(-25 -10 18)"/><ellipse cx="10" cy="18" rx="12" ry="6" fill="#1d8f4e" transform="rotate(25 10 18)"/>
-      <circle cx="-3" cy="14" r="4" fill="#e63946"/><circle cx="4" cy="12" r="4" fill="#e63946"/>
-    </g></g>`);
+  case 1: {
+    const nose = `<circle cx="14" cy="8" r="9" fill="#f4b99a" ${OL}/><circle cx="11" cy="4.6" r="2.4" fill="#fff" opacity=".65"/>`;
+    const hat = `<path d="M-20 8 Q0 -1 20 4 C20 -12 12 -24 -2 -26 C-16 -27 -26 -18 -30 -8 C-32 -2 -34 4 -38 9 C-32 11 -27 9 -24 6 C-22 6 -21 7 -20 8Z" fill="#1f7a44" ${OL}/>
+      <circle cx="-8" cy="-14" r="1.2" fill="#17633a"/><circle cx="4" cy="-18" r="1.2" fill="#17633a"/><circle cx="-18" cy="-8" r="1.2" fill="#17633a"/><circle cx="10" cy="-6" r="1.2" fill="#17633a"/><circle cx="-26" cy="0" r="1.2" fill="#17633a"/>
+      <path d="M-21 10 Q0 1 21 6 L20 -1 Q0 -7 -20 2Z" fill="#17633a" ${OL}/>`;
+    const face = "";
+    const mous = `<path d="M1 12 C6 21 18 21 25 13 C21 25 6 25 -1 16 Z" fill="#fff" ${OL}/>`;
+    const headA = `${face}<path d="M-8 8 C0 18 12 22 24 20 Q30 15 36 20 Q42 15 48 20 Q54 15 60 20 Q66 15 72 20 Q80 18 82 24 Q74 30 64 28 Q58 33 50 29 Q42 34 34 29 Q24 33 14 28 C4 26 -6 22 -10 16 Z" fill="#fff" ${OL}/>
+      <path d="M14 24 C30 26 46 24 62 24 M20 27 C34 28 50 27 70 25" stroke="#d6e1ec" stroke-width="1.3" fill="none"/>${mous}${hat}${nose}`;
+    const headB = `${face}<path d="M-8 8 C0 18 10 22 22 22 C30 22 36 26 40 32 C30 35 14 33 4 29 C-4 25 -8 20 -10 16 Z" fill="#fff" ${OL}/>${mous}${hat}${nose}`;
+    const zzz = `<text class="s1-z" x="0" y="0" font-size="10">z</text><text class="s1-z" style="animation-delay:.8s" x="6" y="-6" font-size="13">z</text><text class="s1-z" style="animation-delay:1.6s" x="12" y="-12" font-size="16">Z</text>`;
+    let stars = ""; [[108,30],[122,48],[140,28]].forEach(p => stars += `<circle cx="${p[0]}" cy="${p[1]}" r="1.1" fill="#fff" class="a-twinkle"/>`);
+    return svg("#1e2552", `
+      <rect x="100" y="20" width="48" height="38" rx="3" fill="#0e1638" stroke="#6b4a3a" stroke-width="3"/>${stars}
+      <circle cx="134" cy="34" r="7" fill="#fff3b0"/><path d="M124 20 V58 M100 39 H148" stroke="#6b4a3a" stroke-width="2.5"/>
+      <rect x="178" y="36" width="22" height="116" fill="#141a3c" stroke="#0b1030" stroke-width="2"/>
+      <rect x="0" y="150" width="200" height="50" fill="#2c2340"/>
+      <rect x="22" y="72" width="14" height="80" rx="6" fill="#9c5b34" ${OL}/><circle cx="29" cy="70" r="5" fill="#9c5b34" ${OL}/>
+      <rect x="178" y="100" width="12" height="52" rx="5" fill="#9c5b34" ${OL}/>
+      <rect x="30" y="146" width="6" height="12" fill="#6b3a1f"/><rect x="180" y="146" width="6" height="12" fill="#6b3a1f"/>
+      <rect x="26" y="136" width="160" height="12" rx="3" fill="#7a4426" ${OL}/>
+      <rect x="32" y="120" width="148" height="18" rx="4" fill="#eef0ff" ${OL}/>
+      <ellipse cx="56" cy="114" rx="28" ry="11" fill="#fff" ${OL}/>
+      <g class="s1-breath">
+        <g class="s1-a"><path d="M74 114 C92 98 122 100 142 106 C156 98 172 102 178 114 L180 142 L72 142 Z" fill="#4f6bd8" ${OL}/><path d="M76 120 C100 110 130 112 150 116" stroke="rgba(255,255,255,.35)" stroke-width="2" fill="none"/></g>
+        <g class="s1-b"><path d="M74 110 C90 94 116 92 136 100 C150 106 168 108 178 116 L180 142 L72 142 Z" fill="#4f6bd8" ${OL}/><path d="M76 118 C100 106 130 106 150 114" stroke="rgba(255,255,255,.35)" stroke-width="2" fill="none"/></g>
+      </g>
+      <g class="s1-a"><g transform="translate(60 99) scale(1.2)"><g class="s1-shake">${headA}</g></g></g>
+      <g class="s1-b"><g transform="translate(60 99) scale(-1.2 1.2)">${headB}</g></g>
+      <polygon class="s1-beam" points="180,44 180,76 76,116 44,92" fill="#fff2b3"/>
+      <rect class="s1-light" x="178" y="36" width="5" height="116" fill="#ffe9a0"/>
+      <g class="s1-zA" font-family="Lilita One, Trebuchet MS, sans-serif" fill="#cfe0ff"><g transform="translate(82 86)">${zzz}</g></g>
+      <g class="s1-zB" font-family="Lilita One, Trebuchet MS, sans-serif" fill="#cfe0ff"><g transform="translate(30 82)">${zzz}</g></g>
+      <g class="s1-angry">
+        <g transform="translate(82 80)"><path d="M-6 -2 q4 0 4 -4 M2 -6 q0 4 4 4 M6 2 q-4 0 -4 4 M-2 6 q0 -4 -4 -4" stroke="#e63946" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+        <g transform="translate(96 44)"><rect x="0" y="0" width="42" height="21" rx="10.5" fill="#fff" ${OL}/><path d="M9 20 l-7 9 l13 -9" fill="#fff" ${OL}/><rect x="6" y="16" width="11" height="5" fill="#fff"/>
+          <text x="21" y="15" text-anchor="middle" font-family="Lilita One, Trebuchet MS, sans-serif" font-size="12.5" fill="#e63946">Uff!</text></g>
+      </g>
+      <rect class="s1-fade" width="200" height="200" fill="#000"/>`);
+  }
+  case 2: {
+    let tiles = "";
+    for (let x = 20; x < 200; x += 20) tiles += `<line x1="${x}" y1="0" x2="${x}" y2="174" stroke="#bfe3f2" stroke-width="1.2"/>`;
+    for (let y = 20; y < 174; y += 20) tiles += `<line x1="0" y1="${y}" x2="200" y2="${y}" stroke="#bfe3f2" stroke-width="1.2"/>`;
+    let water = "";
+    [44,50,56,62,68].forEach((x,i) => water += `<line x1="${x}" y1="38" x2="${x + (i-2)*3}" y2="168" stroke="#5fb8ea" stroke-width="2" stroke-linecap="round" class="s2-water" style="animation-delay:${i*.07}s"/>`);
+    const skin = "#ffd9b8";
+    const robe = `
+      <ellipse cx="-9" cy="-3" rx="9" ry="4.5" fill="#ff8fab" ${OL}/><ellipse cx="10" cy="-3" rx="9" ry="4.5" fill="#ff8fab" ${OL}/>
+      <rect x="-11" y="-18" width="7" height="14" rx="3" fill="${skin}" ${OL}/><rect x="4" y="-18" width="7" height="14" rx="3" fill="${skin}" ${OL}/>
+      <path d="M-22 -14 C-24 -40 -20 -56 -12 -62 L12 -62 C20 -56 24 -40 22 -14 Q0 -8 -22 -14Z" fill="#fdf6ff" ${OL}/>
+      <circle cx="-12" cy="-22" r="1.6" fill="#ffc2d1"/><circle cx="12" cy="-20" r="1.6" fill="#ffc2d1"/><circle cx="14" cy="-46" r="1.6" fill="#ffc2d1"/><circle cx="-15" cy="-48" r="1.6" fill="#ffc2d1"/>
+      <path d="M2 -58 L-3 -12" stroke="#3a2340" stroke-width="1.2"/>
+      <path d="M-12 -62 Q-2 -46 3 -58 Q8 -46 12 -62 Q0 -66 -12 -62Z" fill="#ffd1dc" ${OL}/>
+      <path d="M-23 -36 Q0 -31 23 -36 L23 -31 Q0 -26 -23 -31Z" fill="#ff8fab" ${OL}/>
+      <path d="M-6 -31 l-4 10 M-6 -31 l2 10" stroke="#ff8fab" stroke-width="2.8" stroke-linecap="round"/><circle cx="-6" cy="-32" r="3" fill="#ff8fab" ${OL}/>
+      <g class="s2-down">${limb("M-14 -57 Q-21 -47 -20 -37","#fdf6ff",6)}${limb("M14 -57 Q21 -47 20 -37","#fdf6ff",6)}
+        <circle cx="-20" cy="-34" r="4" fill="${skin}" ${OL}/><circle cx="20" cy="-34" r="4" fill="${skin}" ${OL}/></g>
+      <g class="s2-up">${limb("M-14 -57 Q-27 -58 -35 -66","#fdf6ff",6)}${limb("M14 -57 Q27 -58 35 -66","#fdf6ff",6)}
+        <ellipse cx="-39" cy="-69" rx="6" ry="3.8" transform="rotate(-30 -39 -69)" fill="${skin}" ${OL}/><ellipse cx="39" cy="-69" rx="6" ry="3.8" transform="rotate(30 39 -69)" fill="${skin}" ${OL}/>
+        <path d="M-42 -74 l-1 -3 M-38 -75 l0 -3 M42 -74 l1 -3 M38 -75 l0 -3" stroke="#3a2340" stroke-width="1.4" stroke-linecap="round"/></g>
+      <path d="M-11 -82 C-19 -86 -26 -92 -30 -92 C-27 -84 -20 -76 -11 -75Z" fill="${skin}" ${OL}/><path d="M11 -82 C19 -86 26 -92 30 -92 C27 -84 20 -76 11 -75Z" fill="${skin}" ${OL}/>
+      <ellipse cx="0" cy="-80" rx="16" ry="15" fill="${skin}" ${OL}/>
+      <path d="M-13 -89 C-12 -100 -3 -99 0 -95 C2 -101 11 -101 13 -89 C6 -93 -6 -93 -13 -89Z" fill="#e07b39" ${OL}/>
+      <path d="M-15 -86 q-2 3 0 4.5 q2 -1.5 0 -4.5z" fill="#8fd3ff" class="a-twinkle"/><path d="M15 -84 q-2 3 0 4.5 q2 -1.5 0 -4.5z" fill="#8fd3ff" class="a-twinkle" style="animation-delay:.6s"/>
+      <ellipse cx="-5" cy="-81" rx="3.6" ry="4.4" fill="#fff" ${OL}/><ellipse cx="6" cy="-81" rx="3.6" ry="4.4" fill="#fff" ${OL}/>
+      <g class="s2-look"><circle cx="-5" cy="-80.5" r="2.2" fill="#2a1a2a"/><circle cx="6" cy="-80.5" r="2.2" fill="#2a1a2a"/><circle cx="-5.6" cy="-81.4" r=".8" fill="#fff"/><circle cx="5.4" cy="-81.4" r=".8" fill="#fff"/></g>
+      <path d="M-9 -88 Q-5 -91.5 -1 -88.5 M3 -87.5 L10 -87.5" stroke="#3a2340" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="-9" cy="-73" rx="3" ry="2" fill="#ff8fa3" opacity=".6"/><ellipse cx="10" cy="-73" rx="3" ry="2" fill="#ff8fa3" opacity=".6"/>
+      <ellipse cx="1" cy="-75" rx="3.6" ry="3" fill="#f7957c" ${OL}/>
+      <ellipse cx="1" cy="-68.5" rx="2.2" ry="2.6" fill="#7a1f35"/>
+      <g class="s2-q" font-family="Lilita One, Trebuchet MS, sans-serif" fill="#3a86ff"><text x="-30" y="-100" font-size="17" class="a-twinkle">?</text><text x="20" y="-106" font-size="14" class="a-twinkle" style="animation-delay:.5s">?</text></g>`;
+    return svg("#d6f1fb", `${tiles}
+      <rect x="0" y="174" width="200" height="26" fill="#8ccbe0"/>
+      <g transform="translate(172 62)"><circle r="3.4" fill="#9aa6b2" ${OL}/><path d="M0 3 q0 9 -6 9" stroke="#9aa6b2" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+      <ellipse cx="142" cy="177" rx="32" ry="5" fill="#ff8fab"/>
+      <rect x="14" y="20" width="82" height="154" fill="#b9e4f5"/>
+      <path d="M90 14 V30 H62" stroke="#9aa6b2" stroke-width="4" fill="none" stroke-linejoin="round"/>
+      <ellipse cx="56" cy="33" rx="12" ry="4" fill="#c7d0d8" ${OL}/>
+      <g class="s2-on">${water}
+        <circle cx="36" cy="60" r="7" fill="#fff" opacity=".6" class="a-steam"/><circle cx="78" cy="56" r="6" fill="#fff" opacity=".6" class="a-steam" style="animation-delay:1s"/></g>
+      <g class="s2-in"><g transform="translate(56 0)">
+        <path d="M-10 82 C-18 78 -24 72 -28 72 C-25 80 -18 88 -10 89Z" fill="${skin}" ${OL}/><path d="M10 82 C18 78 24 72 28 72 C25 80 18 88 10 89Z" fill="${skin}" ${OL}/>
+        <path d="M-24 112 Q0 98 24 112 L24 122 L-24 122Z" fill="${skin}" ${OL}/>
+        <ellipse cx="0" cy="86" rx="15" ry="14" fill="${skin}" ${OL}/>
+        <g fill="#fff" stroke="#3a2340" stroke-width="1.2"><circle cx="-9" cy="74" r="6"/><circle cx="9" cy="74" r="6"/><circle cx="0" cy="70" r="7"/><circle cx="-4" cy="64" r="5"/><circle cx="5" cy="63" r="4.5"/></g>
+        <path d="M-8 85 q3 -3.5 6 0 M3 85 q3 -3.5 6 0" stroke="#3a2340" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="-9" cy="91" rx="3" ry="2" fill="#ff8fa3" opacity=".6"/><ellipse cx="10" cy="91" rx="3" ry="2" fill="#ff8fa3" opacity=".6"/>
+        <circle cx="1" cy="90" r="3.4" fill="#f7957c" ${OL}/>
+        <ellipse cx="1" cy="96.5" rx="3.2" ry="3.6" fill="#7a1f35" ${OL}/>
+        <g font-family="Lilita One, Trebuchet MS, sans-serif" fill="#3a86ff"><text class="s1-z" x="18" y="66" font-size="14">♪</text><text class="s1-z" style="animation-delay:1.2s" x="24" y="76" font-size="12">♫</text></g>
+      </g></g>
+      <rect x="14" y="100" width="82" height="72" rx="3" fill="#e6f7ff" opacity=".72" ${OL}/>
+      <path d="M24 110 L40 160 M34 108 L44 136" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+      <rect x="10" y="168" width="90" height="7" rx="3" fill="#fff" ${OL}/>
+      <path d="M14 20 V170 M96 20 V170" stroke="#9aa6b2" stroke-width="3"/>
+      <g transform="translate(70 174)"><g class="s2-out"><g class="s2-walk"><g class="s2-bob">${robe}</g></g></g></g>
+      <rect class="s1-fade" width="200" height="200" fill="#000"/>`);
+  }
+  case 3: {
+    const thin = `stroke="#3a2340" stroke-width="1"`;
+    const pop = (x, y, cls) => `<g class="${cls}"><circle cx="${x-3}" cy="${y}" r="3.4" fill="#fffbe8" ${thin}/><circle cx="${x+3}" cy="${y}" r="3.4" fill="#fff3c4" ${thin}/><circle cx="${x}" cy="${y-4}" r="3.6" fill="#fffbe8" ${thin}/></g>`;
+    const OL1 = `stroke="#3a2340" stroke-width="1.1" stroke-linejoin="round"`;
+    const leg = (cls, x) => `<g transform="translate(${x} -12)"><g class="${cls}"><rect x="-4" y="0" width="8" height="10" rx="3" fill="#8f0d17" ${OL}/><ellipse cx="3" cy="11" rx="8.5" ry="4.6" fill="#c1121f" ${OL}/><path d="M-4 14 q7 2.6 14 0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></g>`;
+    const walker = tomte({ c:"#c1121f", c2:"#8f0d17", dx:7, beardEnd:-24, flip:true,
+      legs: `${leg("s3-legB", -7)}${leg("s3-legA", 7)}`,
+      arms: `<ellipse cx="-23" cy="-26" rx="6" ry="10" transform="rotate(14 -23 -26)" fill="#c1121f" ${OL}/>`,
+      extra: `<ellipse cx="24" cy="-26" rx="6" ry="11" transform="rotate(-45 24 -26)" fill="#c1121f" ${OL}/><circle cx="31" cy="-19" r="4.6" fill="#8f0d17" ${OL}/>
+        <g class="s3-hand"><circle cx="35" cy="-18" r="3.8" fill="#fffbe8" ${thin}/><circle cx="37" cy="-22.5" r="3.4" fill="#fff3c4" ${thin}/></g>
+        <g class="s3-wow" font-family="Lilita One, Trebuchet MS, sans-serif" fill="#e63946"><text x="14" y="-108" font-size="28">!</text><text x="28" y="-98" font-size="20">?</text></g>` });
+    return svg("#f6e1c3", `
+      <rect x="0" y="148" width="200" height="4" fill="#d9b48f"/>
+      <rect x="0" y="152" width="200" height="48" fill="#c08a5e"/><path d="M0 168 H200 M0 186 H200 M60 152 V168 M140 168 V186 M30 186 V200" stroke="#a8744c" stroke-width="1.5"/>
+      <rect x="22" y="34" width="38" height="28" fill="#fff8e6" stroke="#9c6644" stroke-width="3"/><path d="M25 59 L36 44 L44 54 L50 47 L57 59Z" fill="#8bc6a0"/><circle cx="50" cy="41" r="3" fill="#ffbe0b"/>
+      <rect x="120" y="102" width="80" height="44" rx="14" fill="#8e44ad" ${OL}/>
+      <rect x="122" y="158" width="5" height="9" fill="#5b2c6f"/><rect x="192" y="158" width="5" height="9" fill="#5b2c6f"/>
+      <rect x="118" y="136" width="84" height="24" rx="8" fill="#a55bc4" ${OL}/>
+      <rect x="112" y="122" width="16" height="40" rx="8" fill="#9b4fbd" ${OL}/>
+      <path d="M160 108 V136" stroke="#7a3593" stroke-width="2"/>
+      <g transform="translate(162 160) scale(.85)">${tomte({ c:"#1f7a44", c2:"#17633a", beardEnd:-8, munch:true,
+        arms: `<ellipse cx="-23" cy="-26" rx="6" ry="10" transform="rotate(14 -23 -26)" fill="#1f7a44" ${OL}/>` })}</g>
+      <path d="M166 132 L186 132 L182 152 L170 152 Z" fill="#fff" ${OL}/>
+      <path d="M171 132 L173.5 152 M176 132 L176 152 M181 132 L178.5 152" stroke="#e63946" stroke-width="2.6"/>
+      <g ${thin}><circle cx="170" cy="130" r="3" fill="#fffbe8"/><circle cx="176" cy="128" r="3.4" fill="#fff3c4"/><circle cx="182" cy="130" r="3" fill="#fffbe8"/><circle cx="173" cy="126" r="2.8" fill="#fffbe8"/><circle cx="179" cy="125" r="2.8" fill="#fffbe8"/></g>
+      <g transform="translate(178 127)"><g class="s3-eat">${limb("M0 0 Q4 7 5 14", "#1f7a44", 6)}<circle cx="5.5" cy="16.5" r="3.8" fill="#17633a" ${OL}/><circle cx="8" cy="19" r="2.4" fill="#fffbe8" ${thin}/></g></g>
+      <polygon class="s3-tv" points="138,200 192,200 180,96 144,96" fill="#9fd8ff"/>
+      <path d="M152 178 L144 164 M176 178 L184 164" stroke="#2f2f3a" stroke-width="2" stroke-linecap="round"/>
+      <rect x="136" y="178" width="56" height="26" rx="4" fill="#2f2f3a" ${OL}/><path d="M146 186 h36 M146 191 h36" stroke="#4a4a58" stroke-width="2"/>
+      ${pop(50,169,"s3-p1")}${pop(80,169,"s3-p2")}${pop(110,169,"s3-p3")}
+      <g transform="translate(12 172)"><g class="s3-walk"><g class="s3-bend"><g transform="scale(.62)">${walker}</g></g></g></g>
+      <rect class="s3-fade" width="200" height="200" fill="#000"/>`);
+  }
   case 4: return svg("#1b2a6b", `${skyStars(4, 26, 200)}
     <circle cx="100" cy="100" r="62" fill="#ffd34d" opacity=".12" class="a-pulse"/>
     ${star(100,102,58,"#ffd34d","a-pulse",0)}
@@ -730,71 +998,91 @@ function doorBg(c, d){
   }
 }
 
-function buildBox(d){
-  const el = document.createElement("div");
-  el.className = "box"; el.tabIndex = 0; el.setAttribute("role","button");
-  const bg = doorBg(COLORS[d-1], d);
-  el.innerHTML = `<div class="inside"></div>
-    <div class="door l" style="background:${bg}"><span class="dnum">${d}</span><span class="tape"></span></div>
-    <div class="door r" style="background:${bg}"><span class="lock" aria-hidden="true">🔒</span><span class="dic">dic</span><span class="tape"></span></div>
-    <div class="cutzone"><div class="cutline">${"<i></i>".repeat(BINS)}</div><span class="hint" aria-hidden="true">✂️</span><span class="scissors" aria-hidden="true">✂️</span></div>`;
-  const st = { d, el, bins:new Set(), cutting:false, last:null,
-    cz: el.querySelector(".cutzone"), segs:[...el.querySelectorAll(".cutline i")], sc: el.querySelector(".scissors") };
-
-  const canCut = () => !opened.has(d) && openable(d);
-  function mark(e){
-    const r = st.cz.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
-    st.sc.style.left = x + "px"; st.sc.style.top = y + "px";
-    if (x < -r.width * .7 || x > r.width * 1.7){ st.last = null; return; }
-    let b = Math.floor(y / r.height * BINS); b = Math.max(0, Math.min(BINS - 1, b));
-    const from = st.last === null ? b : st.last;
-    for (let i = Math.min(from,b); i <= Math.max(from,b); i++){
-      if (!st.bins.has(i)){ st.bins.add(i); st.segs[i].classList.add("on"); }
+/* ---------- Tipo di apertura: taglia, tocca o scarta ---------- */
+const TIPI = (() => {
+  if (Array.isArray(CONFIG.aperture) && CONFIG.aperture.length === 25) return CONFIG.aperture;
+  /* Mix casuale ma equilibrato: mai due prove uguali una accanto all’altra,
+     mai uguali sulla stessa colonna e al massimo 2 uguali per fila. */
+  const K = ["taglia","tocca","scarta"], quota = { taglia:9, tocca:8, scarta:8 }, r = rand(YEAR + 7), a = [];
+  const fits = (i, t) => quota[t] > 0 && [1,5].every(o => i < o || a[i-o] !== t) &&
+    a.slice(i - i % 5, i).filter(x => x === t).length < 2;
+  const go = i => {
+    if (i === 25) return true;
+    const order = K.slice();
+    for (let k = 2; k > 0; k--){ const j = Math.floor(r() * (k + 1)); [order[k], order[j]] = [order[j], order[k]]; }
+    for (const t of order){
+      if (!fits(i, t)) continue;
+      a[i] = t; quota[t]--;
+      if (go(i + 1)) return true;
+      quota[t]++; a.length = i;
     }
-    st.last = b;
-    if (st.bins.size >= BINS - 3) finishCut(st);
-  }
-  st.cz.addEventListener("pointerdown", e => {
-    if (!canCut()) return;
-    st.cutting = true; st.last = null;
-    try { st.cz.setPointerCapture(e.pointerId); } catch(_){}
-    el.classList.add("cutting"); mark(e); e.preventDefault();
-  });
-  st.cz.addEventListener("pointermove", e => { if (st.cutting) mark(e); });
-  ["pointerup","pointercancel","lostpointercapture"].forEach(t => st.cz.addEventListener(t, () => {
-    st.cutting = false; st.last = null; el.classList.remove("cutting");
-  }));
+    return false;
+  };
+  return go(0) ? a : Array.from({ length:25 }, (_, i) => K[i % 3]);
+})();
+const HINT = { taglia:"✂️", tocca:"👆", scarta:"🎁" };
+const INSTR = {
+  taglia: "Taglia lo scotch: scorri il dito lungo la striscia orizzontale e lungo quella verticale.",
+  tocca:  "Tocca la scatola 3 volte per rompere il sigillo.",
+  scarta: "Scarta il regalo: strofina il dito sulla carta per strapparla."
+};
+const PAPERS = [
+  { p:"#c1121f", r:"#ffd34d" }, { p:"#14532d", r:"#ff6b6b" }, { p:"#1e3a8a", r:"#f1f5f9" },
+  { p:"#6d28d9", r:"#ffd34d" }, { p:"#0f766e", r:"#ffc2d1" }, { p:"#b45309", r:"#ffffff" }
+];
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  el.addEventListener("click", () => {
-    if (Date.now() - justCutAt < 1500) return;
-    if (opened.has(d) && openable(d)) return openModal(d, el);
-    if (!openable(d)) return lockedFeedback(st);
-    if (st.bins.size === 0) toast("Trascina le forbici lungo lo scotch, dall’alto in basso ✂️");
-  });
-  el.addEventListener("keydown", e => {
-    if (e.key !== "Enter" && e.key !== " ") return;
-    e.preventDefault();
-    if (opened.has(d) && openable(d)) return openModal(d, el);
-    if (!openable(d)) return lockedFeedback(st);
-    let i = 0;
-    const iv = setInterval(() => {
-      if (i >= BINS){ clearInterval(iv); finishCut(st); return; }
-      st.bins.add(i); st.segs[i].classList.add("on"); i++;
-    }, 30);
-  });
-  return st;
+function sealSVG(){
+  let p = "";
+  for (let i = 0; i <= 72; i++){ const a = i / 72 * Math.PI * 2, r = 44 + 3 * Math.sin(a * 14); p += (i ? "L" : "M") + (50 + Math.cos(a) * r).toFixed(1) + " " + (50 + Math.sin(a) * r).toFixed(1); }
+  return `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${p}Z" fill="#c1121f" stroke="#8d0c18" stroke-width="2"/>
+    <circle cx="50" cy="50" r="31" fill="#ad0f1b" stroke="rgba(255,255,255,.22)" stroke-width="2"/>${star(50,51,19,"#e04556")}
+    <path d="M36 28 Q44 22 54 24" stroke="rgba(255,255,255,.4)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path class="crack c1" d="M50 50 L42 34 L46 24 L40 8" stroke="#3a0006" stroke-width="2.6" fill="none" stroke-linejoin="round"/>
+    <path class="crack c2" d="M50 50 L66 58 L74 54 L92 62 M50 50 L46 68 L54 78 L50 93" stroke="#3a0006" stroke-width="2.6" fill="none" stroke-linejoin="round"/></svg>`;
+}
+const bowSVG = c => `<svg viewBox="0 0 100 70" aria-hidden="true">
+  <path d="M46 40 L34 68 L43 63 L50 44Z M54 40 L66 68 L57 63 L50 44Z" fill="${c}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
+  <path d="M50 36 C30 4 2 10 9 32 C14 48 36 44 50 36Z" fill="${c}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
+  <path d="M50 36 C70 4 98 10 91 32 C86 48 64 44 50 36Z" fill="${c}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
+  <circle cx="50" cy="37" r="8" fill="${c}" stroke="rgba(0,0,0,.3)" stroke-width="1.5"/>
+  <path d="M22 22 Q30 17 39 27 M78 22 Q70 17 61 27" stroke="rgba(255,255,255,.5)" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+
+function faceHTML(d, big){
+  const tipo = TIPI[d-1], bg = doorBg(COLORS[d-1], d);
+  let cover = "";
+  if (tipo === "taglia"){
+    cover = `<div class="tape tape-h"><i class="half a"></i><i class="half b"></i>${big ? `<div class="cutrow">${"<i></i>".repeat(BINS)}</div>` : ""}</div>
+             <div class="tape tape-v"><i class="half a"></i><i class="half b"></i>${big ? `<div class="cutcol">${"<i></i>".repeat(BINS)}</div>` : ""}</div>`;
+  } else if (tipo === "tocca"){
+    cover = `<div class="seal">${sealSVG()}</div>`;
+  } else {
+    const pp = PAPERS[d % PAPERS.length];
+    let pieces = "";
+    if (big){ for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) pieces += `<i style="--px:${c*25}%;--py:${r*25}%"></i>`; }
+    else pieces = "<i></i>";
+    cover = `<div class="paper${big ? "" : " whole"}" style="--paper:${pp.p};--rib:${pp.r}">${pieces}</div><div class="bow">${bowSVG(pp.r)}</div>`;
+  }
+  return `<div class="inside"></div>
+    <div class="door l" style="background:${bg}"></div><div class="door r" style="background:${bg}"></div>
+    <div class="cover">${cover}</div>
+    <span class="dnum">${d}</span><span class="lock" aria-hidden="true">🔒</span><span class="dic">dic</span>
+    <span class="hint" aria-hidden="true">${HINT[tipo]}</span>`;
 }
 
-function finishCut(st){
-  if (opened.has(st.d)) return;
-  st.cutting = false; st.el.classList.remove("cutting");
-  st.segs.forEach(s => s.classList.add("on"));
-  opened.add(st.d); saveOpened();
-  justCutAt = Date.now();
-  st.el.classList.add("cut");
-  setTimeout(() => refreshStates(), 280);
-  setTimeout(() => openModal(st.d, st.el), 1300);
+function buildBox(d){
+  const el = document.createElement("div");
+  el.className = "box t-" + TIPI[d-1]; el.tabIndex = 0; el.setAttribute("role","button");
+  el.innerHTML = faceHTML(d, false);
+  const st = { d, el };
+  const act = () => {
+    if (opened.has(d) && openable(d)) return openModal(d, el);
+    if (!openable(d)) return lockedFeedback(st);
+    openZoom(d, el);
+  };
+  el.addEventListener("click", act);
+  el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); act(); } });
+  return st;
 }
 
 function lockedFeedback(st){
@@ -803,26 +1091,197 @@ function lockedFeedback(st){
 }
 
 function refreshStates(instant){
-  boxes.forEach(st => {
-    const { d, el } = st;
+  boxes.forEach(({ d, el }) => {
     const can = openable(d), isOpen = can && opened.has(d);
     el.setAttribute("aria-label", isOpen ? `Scatola ${d}, aperta: leggi l’indizio` : can ? `Scatola ${d}, pronta da aprire` : `Scatola ${d}, si apre il ${d} dicembre alle 7`);
     if (isOpen && !el.classList.contains("open")){
       el.querySelector(".inside").innerHTML = scene(d) + `<span class="badge">${d}</span>`;
       if (instant) el.classList.add("instant");
-      el.classList.add("cut","open");
+      el.classList.add("open");
       if (instant) requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("instant")));
     }
     if (!isOpen && el.classList.contains("open")){
-      el.classList.remove("open","cut");
+      el.classList.remove("open");
       el.querySelector(".inside").innerHTML = "";
-    }
-    if (!isOpen){
-      st.bins.clear(); st.segs.forEach(s => s.classList.remove("on"));
     }
     el.classList.toggle("ready", can && !isOpen);
     el.classList.toggle("locked", !can);
   });
+}
+
+/* ---------- Scatola ingrandita e prove di apertura ---------- */
+const zoom = document.getElementById("zoom"), zwrap = document.getElementById("zwrap");
+const zinstr = document.getElementById("zinstr"), zprog = document.getElementById("zprog");
+let Z = null;
+
+function openZoom(d, from){
+  const tipo = TIPI[d-1];
+  zwrap.innerHTML = "";
+  const zb = document.createElement("div");
+  zb.className = "box zbox t-" + tipo; zb.tabIndex = 0;
+  zb.setAttribute("role","button"); zb.setAttribute("aria-label", `Scatola ${d}. ${INSTR[tipo]}`);
+  zb.innerHTML = faceHTML(d, true);
+  zwrap.appendChild(zb);
+  zinstr.textContent = INSTR[tipo];
+  Z = { d, tipo, zb, from, done:false, down:false,
+        h:new Set(), v:new Set(), lastH:null, lastV:null, hDone:false, vDone:false,
+        segsH:[...zb.querySelectorAll(".cutrow i")], segsV:[...zb.querySelectorAll(".cutcol i")],
+        taps:0, torn:new Set(), last:null, pieces:[...zb.querySelectorAll(".paper i")] };
+  renderProg();
+  zoom.hidden = false; document.body.style.overflow = "hidden";
+  if (!reduceMotion){
+    const a = from.getBoundingClientRect(), b = zb.getBoundingClientRect();
+    const s = a.width / b.width, dx = (a.left + a.width/2) - (b.left + b.width/2), dy = (a.top + a.height/2) - (b.top + b.height/2);
+    zb.animate([{ transform:`translate(${dx}px,${dy}px) scale(${s})` }, { transform:"none" }], { duration:480, easing:"cubic-bezier(.2,1.1,.35,1)" });
+    zoom.querySelector(".zbackdrop").animate([{ opacity:0 }, { opacity:1 }], { duration:300 });
+  }
+  bindZoom(zb);
+  setTimeout(() => zb.focus({ preventScroll:true }), 60);
+}
+
+function closeZoom(restore){
+  const from = Z && Z.from;
+  zoom.hidden = true; zwrap.innerHTML = ""; Z = null;
+  document.body.style.overflow = "";
+  if (restore && from) from.focus();
+}
+zoom.addEventListener("click", e => { if (e.target.closest("[data-zclose]")) closeZoom(true); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !zoom.hidden) closeZoom(true); });
+
+function bindZoom(zb){
+  zb.addEventListener("pointerdown", e => {
+    if (!Z || Z.done) return;
+    e.preventDefault();
+    if (Z.tipo === "tocca"){ const r = zb.getBoundingClientRect(); tap(e.clientX - r.left, e.clientY - r.top); return; }
+    Z.down = true; Z.lastH = Z.lastV = null; Z.last = null;
+    try { zb.setPointerCapture(e.pointerId); } catch(_){}
+    move(e);
+  });
+  zb.addEventListener("pointermove", e => { if (Z && Z.down && !Z.done) move(e); });
+  ["pointerup","pointercancel","lostpointercapture"].forEach(t => zb.addEventListener(t, () => {
+    if (!Z) return; Z.down = false; Z.lastH = Z.lastV = null; Z.last = null;
+  }));
+  zb.addEventListener("keydown", e => {
+    if (!Z || Z.done || (e.key !== "Enter" && e.key !== " ")) return;
+    e.preventDefault();
+    if (Z.tipo === "tocca"){ const r = zb.getBoundingClientRect(); tap(r.width/2, r.height/2); }
+    else if (Z.tipo === "taglia"){ cutTape(Z.hDone ? "v" : "h"); }
+    else { const left = Z.pieces.map((_, i) => i).filter(i => !Z.torn.has(i)); left.sort(() => Math.random() - .5).slice(0, 5).forEach(tear); checkTear(); }
+  });
+}
+
+function move(e){
+  const r = Z.zb.getBoundingClientRect();
+  const u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
+  if (Z.tipo === "taglia") cutMove(u, v); else tearMove(u, v);
+}
+
+/* Taglio: striscia orizzontale e verticale */
+function fillBins(set, segs, from, to){
+  for (let i = Math.min(from, to); i <= Math.max(from, to); i++){ if (!set.has(i)){ set.add(i); segs[i].classList.add("on"); } }
+}
+function cutMove(u, v){
+  const band = .17, bin = x => Math.max(0, Math.min(BINS - 1, Math.floor(x * BINS)));
+  if (!Z.hDone && Math.abs(v - .5) < band){
+    const b = bin(u); fillBins(Z.h, Z.segsH, Z.lastH === null ? b : Z.lastH, b); Z.lastH = b;
+    if (Z.h.size >= BINS - 3) cutTape("h");
+  } else Z.lastH = null;
+  if (Z && !Z.vDone && Math.abs(u - .5) < band){
+    const b = bin(v); fillBins(Z.v, Z.segsV, Z.lastV === null ? b : Z.lastV, b); Z.lastV = b;
+    if (Z.v.size >= BINS - 3) cutTape("v");
+  } else if (Z) Z.lastV = null;
+}
+function cutTape(k){
+  if (!Z || Z[k + "Done"]) return;
+  Z[k + "Done"] = true;
+  const segs = k === "h" ? Z.segsH : Z.segsV;
+  segs.forEach(s => s.classList.add("on"));
+  const tape = Z.zb.querySelector(k === "h" ? ".tape-h" : ".tape-v");
+  setTimeout(() => tape.classList.add("cut"), 150);
+  renderProg();
+  if (Z.hDone && Z.vDone) complete(650);
+}
+
+/* Tre tocchi sul sigillo */
+function tap(x, y){
+  Z.taps++;
+  sparks(x, y, Z.taps === 3 ? 14 : 7);
+  const zb = Z.zb, seal = zb.querySelector(".seal");
+  zb.classList.remove("squash"); void zb.offsetWidth; zb.classList.add("squash");
+  if (Z.taps === 1) seal.classList.add("lv1");
+  if (Z.taps === 2) seal.classList.add("lv2");
+  renderProg();
+  if (Z.taps >= 3){ seal.classList.add("broken"); complete(450); }
+}
+function sparks(x, y, n){
+  for (let i = 0; i < n; i++){
+    const s = document.createElement("span"); s.className = "spark"; s.textContent = "✦";
+    const a = Math.random() * 6.283, dist = 30 + Math.random() * 50;
+    s.style.left = x + "px"; s.style.top = y + "px";
+    s.style.setProperty("--sx", (Math.cos(a) * dist).toFixed(0) + "px");
+    s.style.setProperty("--sy", (Math.sin(a) * dist).toFixed(0) + "px");
+    Z.zb.appendChild(s); setTimeout(() => s.remove(), 650);
+  }
+}
+
+/* Carta da scartare */
+function tearMove(u, v){
+  const pts = [];
+  if (Z.last){
+    const [lu, lv] = Z.last, steps = Math.max(1, Math.ceil(Math.hypot(u - lu, v - lv) / .04));
+    for (let i = 1; i <= steps; i++) pts.push([lu + (u - lu) * i / steps, lv + (v - lv) * i / steps]);
+  } else pts.push([u, v]);
+  Z.last = [u, v];
+  const R = .07; /* il dito strappa un po’ di carta tutto intorno */
+  for (const [pu, pv] of pts){
+    for (const [ou, ov] of [[0,0],[-R,0],[R,0],[0,-R],[0,R]]){
+      const x = pu + ou, y = pv + ov;
+      if (x < 0 || x >= 1 || y < 0 || y >= 1) continue;
+      tear(Math.floor(y * 5) * 5 + Math.floor(x * 5));
+    }
+  }
+  checkTear();
+}
+function tear(i){
+  if (!Z || Z.torn.has(i)) return;
+  Z.torn.add(i);
+  const c = i % 5 - 2, r = Math.floor(i / 5) - 2, p = Z.pieces[i];
+  p.style.setProperty("--tx", (c * 45 + (Math.random() * 60 - 30)).toFixed(0) + "px");
+  p.style.setProperty("--ty", (r * 45 + 40 + Math.random() * 60).toFixed(0) + "px");
+  p.style.setProperty("--rot", (Math.random() * 240 - 120).toFixed(0) + "deg");
+  p.classList.add("torn");
+  const bow = Z.zb.querySelector(".bow"); if (bow) bow.classList.add("gone");
+  renderProg();
+}
+function checkTear(){
+  if (!Z || Z.done || Z.torn.size < 19) return;
+  Z.pieces.forEach((_, i) => { if (!Z.torn.has(i)) setTimeout(() => tear(i), Math.random() * 250); });
+  complete(700);
+}
+
+function renderProg(){
+  if (!Z) return;
+  if (Z.tipo === "taglia"){
+    zprog.innerHTML = `<span class="${Z.hDone ? "done" : ""}">${Z.hDone ? "✓ " : ""}Orizzontale</span><span class="${Z.vDone ? "done" : ""}">${Z.vDone ? "✓ " : ""}Verticale</span>`;
+  } else if (Z.tipo === "tocca"){
+    zprog.innerHTML = [1,2,3].map(i => `<span class="${Z.taps >= i ? "done" : ""}">${i}</span>`).join("");
+  } else {
+    const pct = Math.min(100, Math.round(Z.torn.size / 25 * 100));
+    zprog.innerHTML = `<span class="${pct >= 76 ? "done" : ""}">Carta strappata: ${pct}%</span>`;
+  }
+}
+
+function complete(delay){
+  if (!Z || Z.done) return;
+  Z.done = true;
+  const { d, zb, from } = Z;
+  opened.add(d); saveOpened(); justCutAt = Date.now();
+  zinstr.textContent = "Ben fatto! La scatola si sta aprendo…";
+  setTimeout(() => { if (zb.isConnected){ zb.querySelector(".inside").innerHTML = scene(d); zb.classList.add("open"); } }, delay);
+  setTimeout(() => {
+    refreshStates();
+    if (Z && Z.d === d && !zoom.hidden){ closeZoom(false); openModal(d, from); }
+  }, delay + 1300);
 }
 
 /* ---------- Countdown ---------- */
